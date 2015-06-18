@@ -1,6 +1,29 @@
 #include "dnsname.hpp"
 #include "dnslabel.hpp"
 #include <iostream>
+#include <iterator>
+
+DNSLabel
+DNSLabelIterator::dereference() const noexcept {
+    return DNSLabel (&*str_it_, llen_);
+}
+
+bool 
+DNSLabelIterator::equal (DNSLabelIterator const& o) const noexcept {
+    return ((llen_ == o.llen_) && (str_it_ == o.str_it_));
+}
+
+void
+DNSLabelIterator::increment() noexcept {
+    std::advance (str_it_, llen_);
+    llen_ ^= *str_it_++;
+}
+
+void
+DNSLabelIterator::decrement() noexcept {
+    llen_ ^= *--str_it_;
+    std::advance (str_it_, -1 * llen_);
+}
 
 DNSName::DNSName 
 (std::string str): str_(std::move (str)), fll_(0), lll_(0) {   
