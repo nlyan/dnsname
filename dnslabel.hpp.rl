@@ -1,7 +1,7 @@
 #include <stdexcept>
 
 %%{
-    machine escaped_dnslabel;
+    machine escaped_dnsname;
     alphtype char;
     
     action begdec { decb = fc - '0'; }
@@ -42,15 +42,14 @@
                    );
     
     label = (safe | escaped | decbyte)+ >beglabel %endlabel;
-    dnsname := label ('.' label >inner_dot)* '.'?;
+    dnsname := label ('.' label >inner_dot)* '.'? 0 @{ fbreak; };
 }%%
 
 
 template <typename Iterator, typename LabelFun, typename DotFun> 
 auto
-for_each_escaped_label (
-    Iterator p, 
-    Iterator const pe, 
+parse_dns_name_cstr (
+    Iterator p,
     LabelFun&& labelfun, 
     DotFun&& dotfun
 ){
@@ -58,14 +57,13 @@ for_each_escaped_label (
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"
 #pragma clang diagnostic ignored "-Wunused-variable"
 %% write data;
-    auto eof = pe;
     int cs;
 %% write init;
 
     unsigned nlen = 0;
     unsigned llen = 0;
     char decb = 0;
-%% write exec;
+%% write exec noend;
 #pragma clang diagnostic pop
 
     if (cs < %%{ write first_final; }%%) {
@@ -74,4 +72,3 @@ for_each_escaped_label (
     
     return nlen;
 }
-

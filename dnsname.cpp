@@ -7,8 +7,8 @@ DNSName::DNSName
     auto out = begin(str_);
     char* prev_llen_ptr = &fll_;
     
-    auto name_len = for_each_escaped_label (
-        begin(str_), end(str_),
+    auto name_len = parse_dns_name_cstr(
+        str_.c_str(),
         [&](char c) {
             *out++ = c;
         },
