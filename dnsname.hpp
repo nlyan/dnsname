@@ -21,7 +21,8 @@ class DNSLabelIterator final: public boost::iterator_facade<
         char len_;
     private:
         DNSLabelIterator
-        (char const* label, char len): label_(label), len_(len) {}
+        (char const* label, char len) noexcept:
+            label_(label), len_(len) {}
 };
 
 class DNSName final {

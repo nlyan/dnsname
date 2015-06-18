@@ -1,11 +1,10 @@
 #include "dnsname.hpp"
 #include "dnslabel.hpp"
-#include <iostream>
 #include <iterator>
 
 DNSLabel
 DNSLabelIterator::dereference() const noexcept {
-    return DNSLabel (label_, len_);
+    return DNSLabel (label_, static_cast<std::size_t>(len_));
 }
 
 bool 
@@ -28,9 +27,9 @@ DNSLabelIterator::decrement() noexcept {
 DNSName::DNSName 
 (std::string str): str_(std::move (str)), fll_(0), lll_(0) {   
     auto out = std::begin(str_);
-    char* prev_llen_ptr = &fll_;
+    char* llen_ptr = &fll_;
     
-    auto name_len = parse_dns_name_cstr(
+    auto name_len = parse_dns_name_cstr (
         str_.c_str(),
         [&](char c) {
             *out++ = c;
@@ -42,30 +41,37 @@ DNSName::DNSName
             if (nlen > 253) {
                 throw std::runtime_error ("DNS name is too long");
             }
-            *prev_llen_ptr ^= llen;
-            prev_llen_ptr = std::addressof(*out++);
-            *prev_llen_ptr = static_cast<char>(llen);
+            *llen_ptr = lll_ ^ static_cast<char>(llen);
+            llen_ptr = std::addressof (*out++);
             lll_ = static_cast<char>(llen);
         }
     );
-    
+
     str_.resize (name_len);
 }
 
 DNSLabelIterator
 DNSName::begin() const noexcept {
-    DNSLabelIterator (str_.c_str(), fll_);
+    return DNSLabelIterator (str_.c_str(), fll_);
 }
 
 DNSLabelIterator
 DNSName::end() const noexcept {
-    DNSLabelIterator (str_.c_str() + str_.size() + 1, lll_);
+    /* This looks dangerous but we use the null terminator, hence
+     * the 'end' is actually the byte after it. 
+     */
+    return DNSLabelIterator (str_.c_str() + str_.size() + 1, lll_);
 }
 
 #include <vector>
+#include <iostream>
 
 int main() {
     std::vector<DNSName> names;
-    names.emplace_back ("www1.cdn3x.microsoft.com");
+    names.emplace_back ("www1.cdn3x.microsoft.museum");
+
+    std::copy (names[0].begin(), names[0].end(),
+        std::ostream_iterator<DNSLabel>(std::cout, "\n"));
 }
+
 
