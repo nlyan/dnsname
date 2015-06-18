@@ -5,29 +5,29 @@
 
 DNSLabel
 DNSLabelIterator::dereference() const noexcept {
-    return DNSLabel (&*str_it_, llen_);
+    return DNSLabel (label_, len_);
 }
 
 bool 
 DNSLabelIterator::equal (DNSLabelIterator const& o) const noexcept {
-    return ((llen_ == o.llen_) && (str_it_ == o.str_it_));
+    return ((len_ == o.len_) && (label_ == o.label_));
 }
 
 void
 DNSLabelIterator::increment() noexcept {
-    std::advance (str_it_, llen_);
-    llen_ ^= *str_it_++;
+    std::advance (label_, len_);
+    len_ ^= *label_++;
 }
 
 void
 DNSLabelIterator::decrement() noexcept {
-    llen_ ^= *--str_it_;
-    std::advance (str_it_, -1 * llen_);
+    len_ ^= *--label_;
+    std::advance (label_, -1 * len_);
 }
 
 DNSName::DNSName 
 (std::string str): str_(std::move (str)), fll_(0), lll_(0) {   
-    auto out = begin(str_);
+    auto out = std::begin(str_);
     char* prev_llen_ptr = &fll_;
     
     auto name_len = parse_dns_name_cstr(
@@ -52,6 +52,15 @@ DNSName::DNSName
     str_.resize (name_len);
 }
 
+DNSLabelIterator
+DNSName::begin() const noexcept {
+    DNSLabelIterator (str_.c_str(), fll_);
+}
+
+DNSLabelIterator
+DNSName::end() const noexcept {
+    DNSLabelIterator (str_.c_str() + str_.size() + 1, lll_);
+}
 
 #include <vector>
 
