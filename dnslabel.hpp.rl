@@ -59,9 +59,9 @@
 namespace {
     
 inline auto
-count_trailing_backslashes (std::string const& s) noexcept {
+count_trailing_backslashes (boost::string_ref s) noexcept {
     auto const n = s.find_last_not_of('\\');
-    if (n == std::string::npos) {
+    if (n == boost::string_ref::npos) {
         return s.size();
     } else {
         return (s.size() - (n + 1));
