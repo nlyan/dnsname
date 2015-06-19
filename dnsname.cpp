@@ -3,8 +3,7 @@
 #include <ostream>
 #include <iostream>
 
-BadDNSName::~BadDNSName
-() noexcept {
+BadDNSName::~BadDNSName() noexcept {
 }
 
 DNSLabel
@@ -31,20 +30,17 @@ DNSLabelIterator::decrement() noexcept {
 
 DNSName::DNSName
 (std::string str): str_(std::move (str)), fll_(0), lll_(0) {   
-    auto out = std::begin(str_);
+    auto out = std::begin (str_);
     char* llen_ptr = &fll_;
     
-    if (str_.empty()) {
-        return;
-    }
-    if (str_ == ".") {
+    if ((str_.empty()) || (str_ == ".")) {
         return;
     }
     if (count_trailing_backslashes (str_) & 1ul) {
         throw BadDNSName();
     }
     
-    auto name_len = parse_dns_name_cstr_unsafe(
+    auto name_len = parse_dns_name_cstr_unsafe (
         str_.c_str(),
         [&](char c) {
             *out++ = c;
@@ -91,9 +87,9 @@ operator==
     using std::begin;
     using std::end;
     return std::equal (
-        begin(na), end(na), begin(nb), end(nb),
+        begin (na), end (na), begin (nb), end (nb),
         [](DNSLabel la, DNSLabel lb) {
-            return std::equal (begin(la), end(la), begin(lb), end(lb),
+            return std::equal (begin (la), end (la), begin (lb), end (lb),
                 [](char a, char b) {
                     if ((a >= 'A') && (a <= 'Z')) { a ^= 0x20; }
                     if ((b >= 'A') && (b <= 'Z')) { b ^= 0x20; }
@@ -109,10 +105,10 @@ operator<
     using std::begin; using std::end;
     using std::rbegin; using std::rend;
     return std::lexicographical_compare (
-        rbegin(na), rend(na), rbegin(nb), rend(nb),
+        rbegin (na), rend (na), rbegin (nb), rend (nb),
         [](DNSLabel la, DNSLabel lb) {
             return std::lexicographical_compare (
-                begin(la), end(la), begin(lb), end(lb),
+                begin (la), end (la), begin (lb), end (lb),
                 [](char a, char b) {
                     if ((a >= 'A') && (a <= 'Z')) { a ^= 0x20; }
                     if ((b >= 'A') && (b <= 'Z')) { b ^= 0x20; }
@@ -123,6 +119,7 @@ operator<
     );
 }
 
+/* TODO: escape the string again */
 std::ostream&
 operator<< (std::ostream& os, DNSName const& name) {
     for (auto const& label: name) {
