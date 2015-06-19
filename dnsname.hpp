@@ -7,7 +7,6 @@
 
 using DNSLabel = boost::string_ref;
 
-
 class BadDNSName final: public std::runtime_error {
     public:
         BadDNSName () noexcept: std::runtime_error("Bad DNS name") {}
@@ -51,7 +50,6 @@ class DNSName final {
         char fll_; /* First label length */
         char lll_; /* Last label length */
 };
-
 
 bool operator== (DNSName const&, DNSName const&) noexcept;
 bool operator< (DNSName const&, DNSName const&) noexcept;
