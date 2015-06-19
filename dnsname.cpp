@@ -1,6 +1,5 @@
 #include "dnsname.hpp"
 #include "dnslabel.hpp"
-#include <iterator>
 
 DNSLabel
 DNSLabelIterator::dereference() const noexcept {
@@ -57,21 +56,55 @@ DNSName::begin() const noexcept {
 
 DNSLabelIterator
 DNSName::end() const noexcept {
-    /* This looks dangerous but we use the null terminator, hence
-     * the 'end' is actually the byte after it. 
-     */
     return DNSLabelIterator (str_.c_str() + str_.size() + 1, lll_);
 }
 
-#include <vector>
-#include <iostream>
+std::reverse_iterator<DNSLabelIterator>
+DNSName::rbegin() const noexcept {
+    return std::make_reverse_iterator(end());
+}
 
-int main() {
-    std::vector<DNSName> names;
-    names.emplace_back ("www1.cdn3x.microsoft.museum");
+std::reverse_iterator<DNSLabelIterator> 
+DNSName::rend() const noexcept {
+    return std::make_reverse_iterator(begin());
+}
 
-    std::copy (names[0].begin(), names[0].end(),
-        std::ostream_iterator<DNSLabel>(std::cout, "\n"));
+bool 
+operator== 
+(DNSName const& na, DNSName const& nb) noexcept {
+    using std::begin;
+    using std::end;
+    return std::equal (
+        begin(na), end(na), begin(nb), end(nb),
+        [](DNSLabel la, DNSLabel lb) {
+            return std::equal (begin(la), end(la), begin(lb), end(lb),
+                [](char a, char b) {
+                    if ((a >= 'A') && (a <= 'Z')) { a ^= 0x20; }
+                    if ((b >= 'A') && (b <= 'Z')) { b ^= 0x20; }
+                    return (a == b);
+                });
+        }
+    );
+}
+
+bool 
+operator<
+(DNSName const& na, DNSName const& nb) noexcept {
+    using std::begin; using std::end;
+    using std::rbegin; using std::rend;
+    return std::lexicographical_compare (
+        rbegin(na), rend(na), rbegin(nb), rend(nb),
+        [](DNSLabel la, DNSLabel lb) {
+            return std::lexicographical_compare (
+                begin(la), end(la), begin(lb), end(lb),
+                [](char a, char b) {
+                    if ((a >= 'A') && (a <= 'Z')) { a ^= 0x20; }
+                    if ((b >= 'A') && (b <= 'Z')) { b ^= 0x20; }
+                    return (a < b);
+                }
+            );
+        }
+    );
 }
 
 
