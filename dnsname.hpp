@@ -29,10 +29,26 @@ class DNSLabelIterator final: public boost::iterator_facade<
         DNSLabelIterator (char const* label, char len) noexcept:
             label_(label), len_(len) {
         }
-        void increment() noexcept;
-        void decrement() noexcept;
-        bool equal (DNSLabelIterator const&) const noexcept;
-        DNSLabel dereference() const noexcept;
+
+        bool 
+        equal (DNSLabelIterator const& o) const noexcept {
+            return ((len_ == o.len_) && (label_ == o.label_));
+        }
+        
+        DNSLabel
+        dereference() const noexcept {
+            return DNSLabel (label_, static_cast<std::size_t>(len_));
+        }
+
+        void increment() noexcept {
+            std::advance (label_, len_);
+            len_ ^= *label_++;
+        }
+
+        void decrement() noexcept {
+            len_ ^= *--label_;
+            std::advance (label_, -1 * len_);
+        }
     private:
         char const* label_;
         char len_;
@@ -42,17 +58,46 @@ class DNSLabelIterator final: public boost::iterator_facade<
 class DNSName final {
     public:
         DNSName (std::string);
-        DNSLabelIterator begin() const noexcept;
-        DNSLabelIterator end() const noexcept;
-        std::reverse_iterator<DNSLabelIterator> rbegin() const noexcept;
-        std::reverse_iterator<DNSLabelIterator> rend() const noexcept;
+        
+        DNSLabelIterator 
+        begin() const noexcept {
+            return DNSLabelIterator (str_.c_str(), fll_);
+        }
+
+        DNSLabelIterator
+        end() const noexcept {
+            return DNSLabelIterator (str_.c_str() + str_.size() + 1, lll_);
+        }
+
+        std::reverse_iterator<DNSLabelIterator> 
+        rbegin() const noexcept {
+            return std::make_reverse_iterator(end());
+        }
+
+        std::reverse_iterator<DNSLabelIterator> 
+        rend() const noexcept {
+            return std::make_reverse_iterator(begin());
+        }
     private:
         std::string str_;
         char fll_; /* First label length */
         char lll_; /* Last label length */
 };
 
-bool operator== (DNSName const&, DNSName const&) noexcept;
-bool operator< (DNSName const&, DNSName const&) noexcept;
+
+inline bool 
+operator== (DNSName const& n1, DNSName const& n2) noexcept {
+    using std::begin; using std::end;
+    return std::equal (begin(n1), end(n1), begin(n2), end(n2));
+}
+
+
+inline bool 
+operator< (DNSName const& n1, DNSName const& n2) noexcept {
+    using std::rbegin; using std::rend;
+    return std::lexicographical_compare 
+           (rbegin(n1), rend(n1), rbegin(n1), rend(n2));
+}
+
 std::ostream& operator<< (std::ostream&, DNSName const&);
 
