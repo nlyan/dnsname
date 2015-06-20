@@ -82,48 +82,23 @@ DNSName::rend() const noexcept {
 }
 
 bool 
-operator== 
-(DNSName const& na, DNSName const& nb) noexcept {
-    using std::begin;
-    using std::end;
-    return std::equal (
-        begin (na), end (na), begin (nb), end (nb),
-        [](DNSLabel la, DNSLabel lb) {
-            return std::equal (begin (la), end (la), begin (lb), end (lb),
-                [](char a, char b) {
-                    if ((a >= 'A') && (a <= 'Z')) { a ^= 0x20; }
-                    if ((b >= 'A') && (b <= 'Z')) { b ^= 0x20; }
-                    return (a == b);
-                });
-        }
-    );
+operator== (DNSName const& n1, DNSName const& n2) noexcept {
+    using std::begin; using std::end;
+    return std::equal (begin(n1), end(n1), begin(n2), end(n2));
 }
 
 bool 
-operator<
-(DNSName const& na, DNSName const& nb) noexcept {
-    using std::begin; using std::end;
+operator< (DNSName const& na, DNSName const& nb) noexcept {
     using std::rbegin; using std::rend;
-    return std::lexicographical_compare (
-        rbegin (na), rend (na), rbegin (nb), rend (nb),
-        [](DNSLabel la, DNSLabel lb) {
-            return std::lexicographical_compare (
-                begin (la), end (la), begin (lb), end (lb),
-                [](char a, char b) {
-                    if ((a >= 'A') && (a <= 'Z')) { a ^= 0x20; }
-                    if ((b >= 'A') && (b <= 'Z')) { b ^= 0x20; }
-                    return (a < b);
-                }
-            );
-        }
-    );
+    return std::lexicographical_compare 
+        (rbegin (na), rend (na), rbegin (nb), rend (nb));
 }
 
 /* TODO: escape the string again */
 std::ostream&
 operator<< (std::ostream& os, DNSName const& name) {
     for (auto const& label: name) {
-        //os << label << ".";
+        os << label.data() << ".";
     }
     return os;
 }
