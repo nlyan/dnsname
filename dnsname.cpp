@@ -123,7 +123,7 @@ operator<
 std::ostream&
 operator<< (std::ostream& os, DNSName const& name) {
     for (auto const& label: name) {
-        os << label << ".";
+        //os << label << ".";
     }
     return os;
 }

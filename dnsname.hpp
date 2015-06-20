@@ -4,8 +4,9 @@
 #include <iosfwd>
 #include <boost/utility/string_ref.hpp> 
 #include <boost/iterator/iterator_facade.hpp>
+#include "dnschar.hpp"
 
-using DNSLabel = boost::string_ref;
+using DNSLabel = boost::basic_string_ref<char, DNSCharTraits>;
 
 class BadDNSName final: public std::runtime_error {
     public:
