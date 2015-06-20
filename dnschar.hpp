@@ -20,14 +20,15 @@ struct DNSCharTraits: std::char_traits<char> {
     }
 
     static int_type
-    compare (char_type const* const s1, char_type const* const s2,
-             std::size_t n) noexcept {
+    compare (char_type const* s1, char_type const* s2, std::size_t n) noexcept {
         while (n--) {
             auto c1 = static_cast<unsigned char>(*s1);
             auto c2 = static_cast<unsigned char>(*s2);
             int_type const d = { c1 - c2 };
             if ((!d) || dnsname_unlikely ((d == -0x20) && is_upper (*s1))
-                     || dnsname_unlikely ((d ==  0x20) && is_lower (*s2))) {
+                     || dnsname_unlikely ((d ==  0x20) && is_lower (*s1))) {
+                ++s1;
+                ++s2;
                 continue;
             }
             return d;
