@@ -5,6 +5,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <vector>
 #include <numeric>
+#include <sstream>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -90,6 +91,25 @@ BOOST_AUTO_TEST_CASE (printable_equality) {
         std::next_permutation (begin (p2), end (p2));
         BOOST_CHECK_NE (DNSName (p2), DNSName (p2p));
     }
+}
+
+BOOST_AUTO_TEST_CASE (streaming) {
+    std::ostringstream oss;
+    std::string str ("www.google.com");
+    oss << DNSName (str);
+    BOOST_CHECK_EQUAL (oss.str(), str);
+
+    oss.clear ();
+    oss.str (std::string());
+    str = "www.Goo\\032gle.com";
+    oss << DNSName (str);
+    BOOST_CHECK_EQUAL (oss.str(), str);
+    
+    oss.clear ();
+    oss.str (std::string());
+    str = "www.goo\\046gle.com";
+    oss << DNSName (str);
+    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\.gle.com");
 }
 
 #pragma clang diagnostic pop
