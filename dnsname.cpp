@@ -108,6 +108,8 @@ operator<< (std::ostream& os, DNSName const& name) {
             *out++ = '.';
             os << *l_it++;
         }
+    } else {
+        *out++ = '.';
     }
     return os;
 }
