@@ -19,7 +19,7 @@
         labelfun (decb);
     }
     
-    # Invoked at the end of *every* label
+    # Invoked at the beginning of *every* label
     action beglabel {
         llen = 0;
     }
