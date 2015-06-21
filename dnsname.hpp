@@ -103,7 +103,7 @@ inline bool
 operator< (DNSName const& n1, DNSName const& n2) noexcept {
     using std::rbegin; using std::rend;
     return std::lexicographical_compare 
-           (rbegin(n1), rend(n1), rbegin(n1), rend(n2));
+           (rbegin(n1), rend(n1), rbegin(n2), rend(n2));
 }
 
 
