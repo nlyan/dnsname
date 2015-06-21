@@ -11,15 +11,27 @@
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 
 BOOST_AUTO_TEST_CASE (dots) {
-    BOOST_CHECK_EQUAL (DNSName ("com."), DNSName ("com"));
-    BOOST_CHECK_EQUAL (DNSName ("mail.example.com."), DNSName ("mail.example.com"));
+    BOOST_CHECK_NO_THROW (DNSName (""));
     BOOST_CHECK_NO_THROW (DNSName ("."));
+    BOOST_CHECK_EQUAL (DNSName (""), DNSName (""));
+//     BOOST_CHECK_EQUAL (DNSName ("."), DNSName ("."));
+//     BOOST_CHECK_EQUAL (DNSName (""), DNSName ("."));
+//     BOOST_CHECK_EQUAL (DNSName ("."), DNSName (""));
+    BOOST_CHECK_EQUAL (DNSName ("com"), DNSName ("com."));
+    BOOST_CHECK_EQUAL (DNSName ("com."), DNSName ("com"));
+    BOOST_CHECK_EQUAL (DNSName ("example.com"), DNSName ("example.com."));
+    BOOST_CHECK_EQUAL (DNSName ("example.com."), DNSName ("example.com"));
+    BOOST_CHECK_EQUAL (DNSName ("mail.example.com"), DNSName ("mail.example.com"));
+    BOOST_CHECK_EQUAL (DNSName ("mail.example.com"), DNSName ("mail.example.com."));
+    BOOST_CHECK_EQUAL (DNSName ("mail.example.com."), DNSName ("mail.example.com"));
     BOOST_CHECK_THROW (DNSName (".com"), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("..com"), BadDNSName);
     BOOST_CHECK_THROW (DNSName ("com.."), BadDNSName);
-    BOOST_CHECK_THROW (DNSName (".mail.example.com."), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("..mail.example.com."), BadDNSName);
-    BOOST_CHECK_THROW (DNSName (".mail..example.com."), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("..mail..example.com."), BadDNSName);
+    BOOST_CHECK_THROW (DNSName (".example.com."), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("..example.com."), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("mail..example.com"), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("mail.example..com"), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("mail.example.com.."), BadDNSName);
 }
 
 BOOST_AUTO_TEST_CASE (escapes) {
@@ -37,10 +49,12 @@ BOOST_AUTO_TEST_CASE (escapes) {
 
 BOOST_AUTO_TEST_CASE (case_insensitivity) {
     BOOST_CHECK_EQUAL (DNSName ("Com"), DNSName ("com"));
-    BOOST_CHECK_EQUAL (DNSName ("coM"), DNSName ("com"));
-    BOOST_CHECK_EQUAL (DNSName ("COM"), DNSName ("com"));
+    BOOST_CHECK_EQUAL (DNSName ("com"), DNSName ("coM"));
+    BOOST_CHECK_EQUAL (DNSName ("cOm"), DNSName ("CoM"));
     BOOST_CHECK_EQUAL (DNSName ("abcdefghijklmnopqrstuvwxyz"), 
                        DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+    BOOST_CHECK_EQUAL (DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 
+                       DNSName ("abcdefghijklmnopqrstuvwxyz"));
 }
 
 BOOST_AUTO_TEST_CASE (basic_printable) {
