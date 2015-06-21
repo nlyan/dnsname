@@ -5,6 +5,7 @@
 #include <boost/utility/string_ref.hpp> 
 #include <boost/iterator/iterator_facade.hpp>
 #include "dnschar.hpp"
+#include <cassert>
 
 using DNSLabel = boost::basic_string_ref<char, DNSCharTraits>;
 
@@ -41,11 +42,13 @@ class DNSLabelIterator final: public boost::iterator_facade<
         }
 
         void increment() noexcept {
+            assert (len_ != 0);
             std::advance (label_, len_);
             len_ ^= *label_++;
         }
 
         void decrement() noexcept {
+            assert (len_ != 0);
             len_ ^= *--label_;
             std::advance (label_, -1 * len_);
         }
@@ -61,7 +64,11 @@ class DNSName final {
         
         DNSLabelIterator 
         begin() const noexcept {
-            return DNSLabelIterator (str_.c_str(), fll_);
+            if (fll_) {
+                return DNSLabelIterator (str_.c_str(), fll_);
+            } else  {
+                return end();
+            }
         }
 
         DNSLabelIterator

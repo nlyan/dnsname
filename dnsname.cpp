@@ -11,7 +11,10 @@ DNSName::DNSName
     auto out = std::begin (str_);
     char* llen_ptr = &fll_;
     
-    if ((str_.empty()) || (str_ == ".")) {
+    if (str_ == ".") {
+        str_.clear();
+    }
+    if (str_.empty()) {
         return;
     }
     if (count_trailing_backslashes (str_) & 1ul) {

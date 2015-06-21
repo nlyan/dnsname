@@ -14,9 +14,9 @@ BOOST_AUTO_TEST_CASE (dots) {
     BOOST_CHECK_NO_THROW (DNSName (""));
     BOOST_CHECK_NO_THROW (DNSName ("."));
     BOOST_CHECK_EQUAL (DNSName (""), DNSName (""));
-//     BOOST_CHECK_EQUAL (DNSName ("."), DNSName ("."));
-//     BOOST_CHECK_EQUAL (DNSName (""), DNSName ("."));
-//     BOOST_CHECK_EQUAL (DNSName ("."), DNSName (""));
+    BOOST_CHECK_EQUAL (DNSName ("."), DNSName ("."));
+    BOOST_CHECK_EQUAL (DNSName (""), DNSName ("."));
+    BOOST_CHECK_EQUAL (DNSName ("."), DNSName (""));
     BOOST_CHECK_EQUAL (DNSName ("com"), DNSName ("com."));
     BOOST_CHECK_EQUAL (DNSName ("com."), DNSName ("com"));
     BOOST_CHECK_EQUAL (DNSName ("example.com"), DNSName ("example.com."));
