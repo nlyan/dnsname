@@ -6,6 +6,10 @@
 #include <vector>
 #include <numeric>
 #include <sstream>
+#include <fstream>
+#include <algorithm>
+#include <iostream>
+#include <locale>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -124,6 +128,41 @@ BOOST_AUTO_TEST_CASE (streaming) {
     str = "www.goo\\046gle.com";
     oss << DNSName (str);
     BOOST_CHECK_EQUAL (oss.str(), "www.goo\\.gle.com");
+}
+
+BOOST_AUTO_TEST_CASE (alexa) {
+    std::ifstream csv ("testdata/top-1m-201506201230UTC.csv",
+                       std::ios::in | std::ios::binary);
+    csv.imbue (std::locale::classic());
+    std::vector<DNSName> top1m;
+    top1m.reserve (1000000);
+    std::string line;
+
+    for (std::size_t n = 1; n <= top1m.capacity(); ++n) {
+        std::size_t l;
+        csv >> l;
+        assert (l == n);
+
+        csv.ignore (1, ',');
+        std::getline (csv, line, '\n');
+        BOOST_CHECK_NO_THROW (top1m.emplace_back (line));
+
+        std::ostringstream oss;
+        oss << top1m.back();
+        BOOST_CHECK_EQUAL (line, oss.str());
+    }
+
+    std::sort (begin(top1m), end(top1m));
+
+    std::ifstream txt ("testdata/top-1m-201506201230UTC-sorted.txt",
+                       std::ios::in | std::ios::binary);
+    txt.imbue (std::locale::classic());
+    std::vector<std::string> presorted;
+    presorted.reserve (top1m.capacity());
+    presorted.assign (std::istream_iterator<std::string>(txt),
+                      std::istream_iterator<std::string>());
+    BOOST_CHECK (std::equal(begin(top1m), end(top1m), 
+                            begin(presorted), end(presorted)));
 }
 
 #pragma clang diagnostic pop
