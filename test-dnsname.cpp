@@ -124,6 +124,13 @@ BOOST_AUTO_TEST_CASE (streaming) {
     
     oss.clear ();
     oss.str (std::string());
+    auto flags = oss.flags();
+    oss << std::showpoint << std::uppercase << DNSName ("WwW.Goo\\ GLe.cOm");
+    oss.flags (flags);
+    BOOST_CHECK_EQUAL (oss.str(), "WwW.Goo\\032GLe.cOm.");
+
+    oss.clear ();
+    oss.str (std::string());
     oss << DNSName ("www.goo\\046gle.com.");
     BOOST_CHECK_EQUAL (oss.str(), "www.goo\\.gle.com");
 }

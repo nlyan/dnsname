@@ -82,10 +82,16 @@ static const char decimal_escape_seqs[162][3] = {
 
 std::ostream&
 operator<< (std::ostream& os, DNSLabel const& label) {
+    std::ostream::sentry sentry (os);
+    if (!sentry) {
+        return os;
+    }
     std::ostreambuf_iterator<char> out(os);
-    for (char const c: label) {
+    bool const nouppercase = !(os.flags() & std::ios_base::uppercase);
+    for (char c: label) {
         if ((c == '.') || (c == '\\')) {
             *out++ = '\\';
+            *out++ = c;
         } else if ((c < 0x21) || (c > 0x7e)) {
             auto uc = static_cast<unsigned char>(c);
             uc += 0x81;
@@ -93,15 +99,22 @@ operator<< (std::ostream& os, DNSLabel const& label) {
             *out++ = decimal_escape_seqs[uc][0];
             *out++ = decimal_escape_seqs[uc][1];
             *out++ = decimal_escape_seqs[uc][2];
-            continue;
+        } else {
+            if (nouppercase) {
+                DNSCharTraits::lower(c);
+            }
+            *out++ = c;
         }
-        *out++ = DNSCharTraits::to_lower(c);
     }
     return os;
 }
 
 std::ostream&
 operator<< (std::ostream& os, DNSName const& name) {
+    std::ostream::sentry sentry (os);
+    if (!sentry) {
+        return os;
+    }
     std::ostreambuf_iterator<char> out(os);
     auto l_it = name.begin();
     auto const l_end = name.end();
@@ -111,7 +124,8 @@ operator<< (std::ostream& os, DNSName const& name) {
             *out++ = '.';
             os << *l_it++;
         }
-    } else {
+    }
+    if (os.flags() & std::ios_base::showpoint) {
         *out++ = '.';
     }
     return os;
