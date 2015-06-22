@@ -119,14 +119,12 @@ BOOST_AUTO_TEST_CASE (streaming) {
 
     oss.clear ();
     oss.str (std::string());
-    str = "www.Goo\\032gle.com";
-    oss << DNSName (str);
-    BOOST_CHECK_EQUAL (oss.str(), str);
+    oss << DNSName ("WwW.Goo\\ GLe.cOm");
+    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\032gle.com");
     
     oss.clear ();
     oss.str (std::string());
-    str = "www.goo\\046gle.com";
-    oss << DNSName (str);
+    oss << DNSName ("www.goo\\046gle.com.");
     BOOST_CHECK_EQUAL (oss.str(), "www.goo\\.gle.com");
 }
 

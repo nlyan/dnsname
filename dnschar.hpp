@@ -13,10 +13,16 @@ struct DNSCharTraits: std::char_traits<char> {
         return ((c >= 'a') && (c <= 'z'));
     }
 
+    static char_type
+    to_lower (char_type c) noexcept {
+        if (is_upper(c)) { c |= 0x20; }
+        return c;
+    }
+
     static void
     lower (char_type& c1, char_type& c2) noexcept {
-        if (is_upper(c1)) { c1 |= 0x20; }
-        if (is_upper(c2)) { c2 |= 0x20; }
+        c1 = to_lower(c1);
+        c2 = to_lower(c2);
     }
 
     static int_type

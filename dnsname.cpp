@@ -95,7 +95,7 @@ operator<< (std::ostream& os, DNSLabel const& label) {
             *out++ = decimal_escape_seqs[uc][2];
             continue;
         }
-        *out++ = c;
+        *out++ = DNSCharTraits::to_lower(c);
     }
     return os;
 }
