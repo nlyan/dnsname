@@ -1,11 +1,12 @@
-#include <iterator>
+#include "dnschar.hpp"
 #include <string>
-#include <stdexcept>
-#include <iosfwd>
+#include <iterator>                     // for begin, end, reverse_iterator
+#include <algorithm>                    // for equal, lexicographical_compare
+#include <stdexcept>                    // for runtime_error
+#include <iosfwd>                       // for forward decl of ostream
+#include <cassert>                      // for assert
 #include <boost/utility/string_ref.hpp> 
 #include <boost/iterator/iterator_facade.hpp>
-#include "dnschar.hpp"
-#include <cassert>
 
 using DNSLabel = boost::basic_string_ref<char, DNSCharTraits>;
 
