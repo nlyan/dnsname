@@ -1,5 +1,5 @@
 #include "dnsname.hpp"
-#include "dnslabel.hpp"
+#include "dnsparse.hpp"
 #include <ostream>
 
 BadDNSName::~BadDNSName() noexcept {
