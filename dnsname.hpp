@@ -62,6 +62,7 @@ class DNSLabelIterator final: public boost::iterator_facade<
 class DNSName final {
     public:
         DNSName (std::string);
+        DNSName (char const*) = delete;
         
         DNSLabelIterator 
         begin() const noexcept {
