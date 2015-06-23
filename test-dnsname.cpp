@@ -11,54 +11,56 @@
 #include <iostream>
 #include <locale>
 
+using namespace std::literals::string_literals;
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 
 BOOST_AUTO_TEST_CASE (dots) {
-    BOOST_CHECK_NO_THROW (DNSName (""));
-    BOOST_CHECK_NO_THROW (DNSName ("."));
-    BOOST_CHECK_EQUAL (DNSName (""), DNSName (""));
-    BOOST_CHECK_EQUAL (DNSName ("."), DNSName ("."));
-    BOOST_CHECK_EQUAL (DNSName (""), DNSName ("."));
-    BOOST_CHECK_EQUAL (DNSName ("."), DNSName (""));
-    BOOST_CHECK_EQUAL (DNSName ("com"), DNSName ("com."));
-    BOOST_CHECK_EQUAL (DNSName ("com."), DNSName ("com"));
-    BOOST_CHECK_EQUAL (DNSName ("example.com"), DNSName ("example.com."));
-    BOOST_CHECK_EQUAL (DNSName ("example.com."), DNSName ("example.com"));
-    BOOST_CHECK_EQUAL (DNSName ("mail.example.com"), DNSName ("mail.example.com"));
-    BOOST_CHECK_EQUAL (DNSName ("mail.example.com"), DNSName ("mail.example.com."));
-    BOOST_CHECK_EQUAL (DNSName ("mail.example.com."), DNSName ("mail.example.com"));
-    BOOST_CHECK_THROW (DNSName (".com"), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("..com"), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("com.."), BadDNSName);
-    BOOST_CHECK_THROW (DNSName (".example.com."), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("..example.com."), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("mail..example.com"), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("mail.example..com"), BadDNSName);
-    BOOST_CHECK_THROW (DNSName ("mail.example.com.."), BadDNSName);
+    BOOST_CHECK_NO_THROW (DNSName (""s));
+    BOOST_CHECK_NO_THROW (DNSName ("."s));
+    BOOST_CHECK_EQUAL (DNSName (""s), DNSName (""s));
+    BOOST_CHECK_EQUAL (DNSName ("."s), DNSName ("."s));
+    BOOST_CHECK_EQUAL (DNSName (""s), DNSName ("."s));
+    BOOST_CHECK_EQUAL (DNSName ("."s), DNSName (""s));
+    BOOST_CHECK_EQUAL (DNSName ("com"s), DNSName ("com."s));
+    BOOST_CHECK_EQUAL (DNSName ("com."s), DNSName ("com"s));
+    BOOST_CHECK_EQUAL (DNSName ("example.com"s), DNSName ("example.com."s));
+    BOOST_CHECK_EQUAL (DNSName ("example.com."s), DNSName ("example.com"s));
+    BOOST_CHECK_EQUAL (DNSName ("mail.example.com"s), DNSName ("mail.example.com"s));
+    BOOST_CHECK_EQUAL (DNSName ("mail.example.com"s), DNSName ("mail.example.com."s));
+    BOOST_CHECK_EQUAL (DNSName ("mail.example.com."s), DNSName ("mail.example.com"s));
+    BOOST_CHECK_THROW (DNSName (".com"s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("..com"s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("com.."s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName (".example.com."s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("..example.com."s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("mail..example.com"s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("mail.example..com"s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName ("mail.example.com.."s), BadDNSName);
 }
 
 BOOST_AUTO_TEST_CASE (escapes) {
-    BOOST_CHECK_EQUAL (DNSName (R"(\com)"), DNSName (R"(\com)"));
-    BOOST_CHECK_EQUAL (DNSName (R"(\com)"), DNSName ("com"));
-    BOOST_CHECK_EQUAL (DNSName (R"(\c\o\m)"), DNSName ("com"));
-    BOOST_CHECK_EQUAL (DNSName (R"(\c\o\m\.)"), DNSName (R"(com\..)"));
+    BOOST_CHECK_EQUAL (DNSName (R"(\com)"s), DNSName (R"(\com)"s));
+    BOOST_CHECK_EQUAL (DNSName (R"(\com)"s), DNSName ("com"s));
+    BOOST_CHECK_EQUAL (DNSName (R"(\c\o\m)"s), DNSName ("com"s));
+    BOOST_CHECK_EQUAL (DNSName (R"(\c\o\m\.)"s), DNSName (R"(com\..)"s));
     /* Checks termination */
-    BOOST_CHECK_THROW (DNSName (R"(\)"), BadDNSName);
-    BOOST_CHECK_THROW (DNSName (R"(\\\)"), BadDNSName);
-    BOOST_CHECK_THROW (DNSName (R"(\\\\..)"), BadDNSName);
-    BOOST_CHECK_NO_THROW (DNSName (R"(\.)"));
-    BOOST_CHECK_NO_THROW (DNSName (R"(\\)"));
+    BOOST_CHECK_THROW (DNSName (R"(\)"s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName (R"(\\\)"s), BadDNSName);
+    BOOST_CHECK_THROW (DNSName (R"(\\\\..)"s), BadDNSName);
+    BOOST_CHECK_NO_THROW (DNSName (R"(\.)"s));
+    BOOST_CHECK_NO_THROW (DNSName (R"(\\)"s));
 }
 
 BOOST_AUTO_TEST_CASE (case_insensitivity) {
-    BOOST_CHECK_EQUAL (DNSName ("Com"), DNSName ("com"));
-    BOOST_CHECK_EQUAL (DNSName ("com"), DNSName ("coM"));
-    BOOST_CHECK_EQUAL (DNSName ("cOm"), DNSName ("CoM"));
-    BOOST_CHECK_EQUAL (DNSName ("abcdefghijklmnopqrstuvwxyz"), 
-                       DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-    BOOST_CHECK_EQUAL (DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 
-                       DNSName ("abcdefghijklmnopqrstuvwxyz"));
+    BOOST_CHECK_EQUAL (DNSName ("Com"s), DNSName ("com"s));
+    BOOST_CHECK_EQUAL (DNSName ("com"s), DNSName ("coM"s));
+    BOOST_CHECK_EQUAL (DNSName ("cOm"s), DNSName ("CoM"s));
+    BOOST_CHECK_EQUAL (DNSName ("abcdefghijklmnopqrstuvwxyz"s), 
+                       DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"s));
+    BOOST_CHECK_EQUAL (DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"s), 
+                       DNSName ("abcdefghijklmnopqrstuvwxyz"s));
 }
 
 BOOST_AUTO_TEST_CASE (basic_printable) {
@@ -141,14 +143,14 @@ BOOST_AUTO_TEST_CASE (decimal_escapes) {
     for (auto i = 1; i < 48; ++i) {
         std::ostringstream oss;
         oss << "\\" << std::setw(3) << std::setfill('0') << i;
-        std::string s ("\\");
+        std::string s ("\\"s);
         s.append (1, static_cast<char>(i));
         BOOST_CHECK_EQUAL (DNSName (oss.str()), DNSName(s));
     }
     for (auto i = 58; i < 256; ++i) {
         std::ostringstream oss;
         oss << "\\" << std::setw(3) << std::setfill('0') << i;
-        std::string s ("\\");
+        std::string s ("\\"s);
         s.append (1, static_cast<char>(i));
         BOOST_CHECK_EQUAL (DNSName (oss.str()), DNSName(s));
     }
@@ -156,26 +158,26 @@ BOOST_AUTO_TEST_CASE (decimal_escapes) {
 
 BOOST_AUTO_TEST_CASE (streaming) {
     std::ostringstream oss;
-    std::string str ("www.google.com");
+    std::string str ("www.google.com"s);
     oss << DNSName (str);
     BOOST_CHECK_EQUAL (oss.str(), str);
 
     oss.clear ();
     oss.str (std::string());
-    oss << DNSName ("WwW.Goo\\ GLe.cOm");
-    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\032gle.com");
+    oss << DNSName ("WwW.Goo\\ GLe.cOm"s);
+    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\032gle.com"s);
     
     oss.clear ();
     oss.str (std::string());
     auto flags = oss.flags();
-    oss << std::showpoint << std::uppercase << DNSName ("WwW.Goo\\ GLe.cOm");
+    oss << std::showpoint << std::uppercase << DNSName ("WwW.Goo\\ GLe.cOm"s);
     oss.flags (flags);
-    BOOST_CHECK_EQUAL (oss.str(), "WwW.Goo\\032GLe.cOm.");
+    BOOST_CHECK_EQUAL (oss.str(), "WwW.Goo\\032GLe.cOm."s);
 
     oss.clear ();
     oss.str (std::string());
-    oss << DNSName ("www.goo\\046gle.com.");
-    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\.gle.com");
+    oss << DNSName ("www.goo\\046gle.com."s);
+    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\.gle.com"s);
 }
 
 BOOST_AUTO_TEST_CASE (alexa) {
