@@ -111,6 +111,49 @@ BOOST_AUTO_TEST_CASE (printable_equality) {
     }
 }
 
+BOOST_AUTO_TEST_CASE (decimal_escapes) {
+    for (auto i = 0; i < 10; ++i) {
+        std::ostringstream oss;
+        oss << "\\" << i;
+        BOOST_CHECK_THROW (DNSName (oss.str()), BadDNSName);
+    }
+    for (auto i = 0; i < 10; ++i) {
+        std::ostringstream oss;
+        oss << "\\" << std::setw(2) << std::setfill('0') << i;
+        BOOST_CHECK_THROW (DNSName (oss.str()), BadDNSName);
+    }
+    for (auto i = 0; i < 10; ++i) {
+        std::ostringstream oss;
+        oss << "\\" << std::setw(3) << std::setfill('0') << i;
+        BOOST_CHECK_NO_THROW (DNSName x(oss.str()));
+    }
+    for (auto i = 10; i < 100; ++i) {
+        std::ostringstream oss;
+        oss << "\\" << i;
+        BOOST_CHECK_THROW (DNSName (oss.str()), BadDNSName);
+    }
+    for (auto i = 10; i < 100; ++i) {
+        std::ostringstream oss;
+        oss << "\\" << std::setw(3) << std::setfill('0') << i;
+        BOOST_CHECK_NO_THROW (DNSName x(oss.str()));
+    }
+    /* BUG: i = 0, trailing backslashes again */
+    for (auto i = 1; i < 48; ++i) {
+        std::ostringstream oss;
+        oss << "\\" << std::setw(3) << std::setfill('0') << i;
+        std::string s ("\\");
+        s.append (1, static_cast<char>(i));
+        BOOST_CHECK_EQUAL (DNSName (oss.str()), DNSName(s));
+    }
+    for (auto i = 58; i < 256; ++i) {
+        std::ostringstream oss;
+        oss << "\\" << std::setw(3) << std::setfill('0') << i;
+        std::string s ("\\");
+        s.append (1, static_cast<char>(i));
+        BOOST_CHECK_EQUAL (DNSName (oss.str()), DNSName(s));
+    }
+}
+
 BOOST_AUTO_TEST_CASE (streaming) {
     std::ostringstream oss;
     std::string str ("www.google.com");
