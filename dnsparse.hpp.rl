@@ -1,8 +1,4 @@
-#include <iterator>
-#ifndef NDEBUG
-#include <boost/utility/string_ref.hpp>
-#include <cassert>
-#endif
+#include <string>
 
 %%{
     machine escaped_dnsname;
@@ -59,30 +55,26 @@
 namespace {
     
 inline auto
-count_trailing_backslashes (boost::string_ref s) noexcept {
+count_trailing_backslashes (std::string& s) noexcept {
     auto const n = s.find_last_not_of('\\');
-    if (n == boost::string_ref::npos) {
+    if (n == std::string::npos) {
         return s.size();
     } else {
         return (s.size() - (n + 1));
     }
 }
 
-
-template <typename Iterator, typename LabelFun, typename DotFun> 
+/* DANGER: While using Ragels 'noend' directive this function is unsafe when
+ * called on a null terminated string with an active trailing escape character. 
+ * This means the caller needs to check for an odd number of trailing \'s 
+ * before calling this function.
+ */
+template <typename LabelFun, typename DotFun> 
 auto parse_dns_name_cstr_unsafe (
-    Iterator p,
+    char const* p,
     LabelFun&& labelfun, 
     DotFun&& dotfun
 ){
-#ifndef NDEBUG
-    /* While using Ragels 'noend' directive this function is unsafe when
-     * called on a string with an active trailing escape character. 
-     * This means the caller needs to check for an odd number of trailing \'s 
-     * before calling this function.
-     */
-    assert (0 == (count_trailing_backslashes(p) & 1ul));
-#endif
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"
 #pragma clang diagnostic ignored "-Wunused-variable"

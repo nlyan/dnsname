@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE (decimal_escapes) {
         BOOST_CHECK_NO_THROW (DNSName x(oss.str()));
     }
     /* BUG: i = 0, trailing backslashes again */
-    for (auto i = 1; i < 48; ++i) {
+    for (auto i = 0; i < 48; ++i) {
         std::ostringstream oss;
         oss << "\\" << std::setw(3) << std::setfill('0') << i;
         std::string s ("\\"s);
