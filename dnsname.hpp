@@ -87,6 +87,11 @@ class DNSName final {
         rend() const noexcept {
             return std::make_reverse_iterator(begin());
         }
+
+        std::size_t
+        label_count() const noexcept {
+            return std::distance (begin(), end());
+        }
     private:
         std::string str_;
         char fll_; /* First label length */
