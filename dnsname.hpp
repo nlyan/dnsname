@@ -108,7 +108,6 @@ operator< (DNSName const& n1, DNSName const& n2) noexcept {
            (rbegin(n1), rend(n1), rbegin(n2), rend(n2));
 }
 
-
 std::ostream& operator<< (std::ostream&, DNSLabel const&);
 std::ostream& operator<< (std::ostream&, DNSName const&);
 

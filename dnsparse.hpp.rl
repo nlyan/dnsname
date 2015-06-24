@@ -91,7 +91,7 @@ auto parse_dns_name_cstr_unsafe (
         throw BadDNSName();
     }
     
-    return nlen;
+    return p;
 }
 
 }

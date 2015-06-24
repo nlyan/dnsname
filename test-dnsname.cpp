@@ -114,6 +114,8 @@ BOOST_AUTO_TEST_CASE (printable_equality) {
 }
 
 BOOST_AUTO_TEST_CASE (decimal_escapes) {
+    BOOST_CHECK_THROW (DNSName ("www.google.com.\x00subdomain.domain.com"s),
+                       BadDNSName);
     for (auto i = 0; i < 10; ++i) {
         std::ostringstream oss;
         oss << "\\" << i;
@@ -139,7 +141,6 @@ BOOST_AUTO_TEST_CASE (decimal_escapes) {
         oss << "\\" << std::setw(3) << std::setfill('0') << i;
         BOOST_CHECK_NO_THROW (DNSName x(oss.str()));
     }
-    /* BUG: i = 0, trailing backslashes again */
     for (auto i = 0; i < 48; ++i) {
         std::ostringstream oss;
         oss << "\\" << std::setw(3) << std::setfill('0') << i;

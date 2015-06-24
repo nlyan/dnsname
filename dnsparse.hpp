@@ -305,7 +305,7 @@ case 9:
         throw BadDNSName();
     }
     
-    return nlen;
+    return p;
 }
 
 }
