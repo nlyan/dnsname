@@ -88,9 +88,9 @@ class DNSName final {
             return std::make_reverse_iterator(begin());
         }
 
-        std::size_t
+        auto
         label_count() const noexcept {
-            return std::distance (begin(), end());
+            return static_cast<std::uint8_t>(std::distance (begin(), end()));
         }
     private:
         std::string str_;
