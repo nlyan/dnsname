@@ -17,14 +17,10 @@ DNSName::DNSName
     if (str_.empty()) {
         return;
     }
-    /* Check for trailing active escape characters */
-    if (count_trailing_backslashes (str_) & 1ul) {
-        throw BadDNSName();
-    }
     
-    std::size_t name_len = 0;
-    auto pe = parse_dns_name_cstr_unsafe (
+    std::size_t name_len = parse_dns_name_cstr (
         str_.c_str(),
+        str_.c_str() + str_.size(),
         [&](char c) {
             *out++ = c;
         },
@@ -38,15 +34,8 @@ DNSName::DNSName
             *llen_ptr = lll_ ^ static_cast<char>(llen);
             llen_ptr = std::addressof (*out++);
             lll_ = static_cast<char>(llen);
-            name_len = nlen;
         }
     );
-
-    /* Check that the entire string was consumed 
-     * (i.e. that there were no embedded nulls) */
-    if (pe != (str_.c_str() + str_.size() + 1)) {
-        throw BadDNSName();
-    }
 
     str_.resize (name_len);
 }

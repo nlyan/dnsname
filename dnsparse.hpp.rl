@@ -48,30 +48,16 @@
                 );
 
     label = (safe | escaped | decbyte)+ >beglabel %endlabel;
-    dnsname := label ('.' label >inner_dot)* '.'? 0 @{ fbreak; };
+    dnsname := label ('.' label >inner_dot)* '.'?;
 }%%
 
 
 namespace {
     
-inline auto
-count_trailing_backslashes (std::string& s) noexcept {
-    auto const n = s.find_last_not_of('\\');
-    if (n == std::string::npos) {
-        return s.size();
-    } else {
-        return (s.size() - (n + 1));
-    }
-}
-
-/* DANGER: While using Ragels 'noend' directive this function is unsafe when
- * called on a null terminated string with an active trailing escape character. 
- * This means the caller needs to check for an odd number of trailing \'s 
- * before calling this function.
- */
 template <typename LabelFun, typename DotFun> 
-auto parse_dns_name_cstr_unsafe (
+auto parse_dns_name_cstr (
     char const* p,
+    char const* const pe,
     LabelFun&& labelfun, 
     DotFun&& dotfun
 ){
@@ -80,18 +66,19 @@ auto parse_dns_name_cstr_unsafe (
 #pragma clang diagnostic ignored "-Wunused-variable"
 %% write data;
     int cs;
+    auto const eof = pe;
 %% write init;
     unsigned nlen = 0;
     unsigned llen = 0;
     char decb = 0;
-%% write exec noend;
+%% write exec;
 #pragma clang diagnostic pop
 
     if (cs < %%{ write first_final; }%%) {
         throw BadDNSName();
     }
     
-    return p;
+    return nlen;
 }
 
 }

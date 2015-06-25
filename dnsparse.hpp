@@ -9,24 +9,10 @@
 
 namespace {
     
-inline auto
-count_trailing_backslashes (std::string& s) noexcept {
-    auto const n = s.find_last_not_of('\\');
-    if (n == std::string::npos) {
-        return s.size();
-    } else {
-        return (s.size() - (n + 1));
-    }
-}
-
-/* DANGER: While using Ragels 'noend' directive this function is unsafe when
- * called on a null terminated string with an active trailing escape character. 
- * This means the caller needs to check for an odd number of trailing \'s 
- * before calling this function.
- */
 template <typename LabelFun, typename DotFun> 
-auto parse_dns_name_cstr_unsafe (
+auto parse_dns_name_cstr (
     char const* p,
+    char const* const pe,
     LabelFun&& labelfun, 
     DotFun&& dotfun
 ){
@@ -34,29 +20,32 @@ auto parse_dns_name_cstr_unsafe (
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"
 #pragma clang diagnostic ignored "-Wunused-variable"
 
-#line 38 "dnsparse.hpp"
+#line 24 "dnsparse.hpp"
 static const int escaped_dnsname_start = 1;
-static const int escaped_dnsname_first_final = 10;
+static const int escaped_dnsname_first_final = 7;
 static const int escaped_dnsname_error = 0;
 
 static const int escaped_dnsname_en_dnsname = 1;
 
 
-#line 82 "dnsparse.hpp.rl"
+#line 68 "dnsparse.hpp.rl"
     int cs;
+    auto const eof = pe;
 
-#line 49 "dnsparse.hpp"
+#line 36 "dnsparse.hpp"
 	{
 	cs = escaped_dnsname_start;
 	}
 
-#line 84 "dnsparse.hpp.rl"
+#line 71 "dnsparse.hpp.rl"
     unsigned nlen = 0;
     unsigned llen = 0;
     char decb = 0;
 
-#line 59 "dnsparse.hpp"
+#line 46 "dnsparse.hpp"
 	{
+	if ( p == pe )
+		goto _test_eof;
 	switch ( cs )
 	{
 case 1:
@@ -81,15 +70,15 @@ tr0:
         ++llen;
         labelfun ((*p));
     }
-	goto st2;
-tr4:
+	goto st7;
+tr3:
 #line 24 "dnsparse.hpp.rl"
 	{
         ++llen;
         labelfun ((*p));
     }
-	goto st2;
-tr8:
+	goto st7;
+tr11:
 #line 30 "dnsparse.hpp.rl"
 	{
         ++nlen;
@@ -103,8 +92,8 @@ tr8:
         ++llen;
         labelfun ((*p));
     }
-	goto st2;
-tr15:
+	goto st7;
+tr13:
 #line 13 "dnsparse.hpp.rl"
 	{
         ++llen;
@@ -115,32 +104,26 @@ tr15:
         ++llen;
         labelfun ((*p));
     }
-	goto st2;
-st2:
-	p += 1;
-case 2:
-#line 123 "dnsparse.hpp"
+	goto st7;
+st7:
+	if ( ++p == pe )
+		goto _test_eof7;
+case 7:
+#line 113 "dnsparse.hpp"
 	switch( (*p) ) {
-		case 0: goto tr3;
-		case 46: goto tr5;
-		case 92: goto st4;
+		case 46: goto tr9;
+		case 92: goto st2;
 	}
 	if ( 33 <= (*p) && (*p) <= 126 )
-		goto tr4;
+		goto tr3;
 	goto st0;
-tr3:
+tr9:
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
         dotfun (llen, nlen);
     }
-#line 51 "dnsparse.hpp.rl"
-	{ {p++; cs = 10; goto _out;} }
-	goto st10;
-tr7:
-#line 51 "dnsparse.hpp.rl"
-	{ {p++; cs = 10; goto _out;} }
-	goto st10;
+	goto st8;
 tr14:
 #line 13 "dnsparse.hpp.rl"
 	{
@@ -152,54 +135,27 @@ tr14:
         nlen += llen;
         dotfun (llen, nlen);
     }
-#line 51 "dnsparse.hpp.rl"
-	{ {p++; cs = 10; goto _out;} }
-	goto st10;
-st10:
-	p += 1;
-case 10:
-#line 162 "dnsparse.hpp"
-	goto st0;
-tr5:
-#line 35 "dnsparse.hpp.rl"
-	{
-        nlen += llen;
-        dotfun (llen, nlen);
-    }
-	goto st3;
-tr16:
-#line 13 "dnsparse.hpp.rl"
-	{
-        ++llen;
-        labelfun (decb);
-    }
-#line 35 "dnsparse.hpp.rl"
-	{
-        nlen += llen;
-        dotfun (llen, nlen);
-    }
-	goto st3;
-st3:
-	p += 1;
-case 3:
-#line 186 "dnsparse.hpp"
-	switch( (*p) ) {
-		case 0: goto tr7;
-		case 92: goto tr9;
-	}
+	goto st8;
+st8:
+	if ( ++p == pe )
+		goto _test_eof8;
+case 8:
+#line 144 "dnsparse.hpp"
+	if ( (*p) == 92 )
+		goto tr12;
 	if ( (*p) > 45 ) {
 		if ( 47 <= (*p) && (*p) <= 126 )
-			goto tr8;
+			goto tr11;
 	} else if ( (*p) >= 33 )
-		goto tr8;
+		goto tr11;
 	goto st0;
 tr2:
 #line 19 "dnsparse.hpp.rl"
 	{
         llen = 0;
     }
-	goto st4;
-tr9:
+	goto st2;
+tr12:
 #line 30 "dnsparse.hpp.rl"
 	{
         ++nlen;
@@ -208,104 +164,144 @@ tr9:
 	{
         llen = 0;
     }
-	goto st4;
-tr17:
+	goto st2;
+tr15:
 #line 13 "dnsparse.hpp.rl"
 	{
         ++llen;
         labelfun (decb);
     }
-	goto st4;
-st4:
-	p += 1;
-case 4:
-#line 223 "dnsparse.hpp"
+	goto st2;
+st2:
+	if ( ++p == pe )
+		goto _test_eof2;
+case 2:
+#line 180 "dnsparse.hpp"
 	if ( (*p) == 50 )
-		goto tr11;
+		goto tr5;
 	if ( (*p) > 49 ) {
 		if ( 51 <= (*p) && (*p) <= 57 )
 			goto st0;
 	} else if ( (*p) >= 48 )
-		goto tr10;
-	goto tr4;
-tr10:
+		goto tr4;
+	goto tr3;
+tr4:
+#line 8 "dnsparse.hpp.rl"
+	{ decb = (*p) - '0'; }
+	goto st3;
+st3:
+	if ( ++p == pe )
+		goto _test_eof3;
+case 3:
+#line 10 "dnsparse.hpp.rl"
+	{ decb *= 10; }
+#line 9 "dnsparse.hpp.rl"
+	{ decb += (*p) - '0'; }
+#line 201 "dnsparse.hpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto st4;
+	goto st0;
+st4:
+	if ( ++p == pe )
+		goto _test_eof4;
+case 4:
+#line 10 "dnsparse.hpp.rl"
+	{ decb *= 10; }
+#line 9 "dnsparse.hpp.rl"
+	{ decb += (*p) - '0'; }
+#line 213 "dnsparse.hpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto st9;
+	goto st0;
+st9:
+	if ( ++p == pe )
+		goto _test_eof9;
+case 9:
+	switch( (*p) ) {
+		case 46: goto tr14;
+		case 92: goto tr15;
+	}
+	if ( 33 <= (*p) && (*p) <= 126 )
+		goto tr13;
+	goto st0;
+tr5:
 #line 8 "dnsparse.hpp.rl"
 	{ decb = (*p) - '0'; }
 	goto st5;
 st5:
-	p += 1;
+	if ( ++p == pe )
+		goto _test_eof5;
 case 5:
 #line 10 "dnsparse.hpp.rl"
 	{ decb *= 10; }
 #line 9 "dnsparse.hpp.rl"
 	{ decb += (*p) - '0'; }
-#line 243 "dnsparse.hpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
+#line 240 "dnsparse.hpp"
+	if ( (*p) == 53 )
 		goto st6;
+	if ( 48 <= (*p) && (*p) <= 52 )
+		goto st4;
 	goto st0;
 st6:
-	p += 1;
+	if ( ++p == pe )
+		goto _test_eof6;
 case 6:
 #line 10 "dnsparse.hpp.rl"
 	{ decb *= 10; }
 #line 9 "dnsparse.hpp.rl"
 	{ decb += (*p) - '0'; }
 #line 254 "dnsparse.hpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto st7;
-	goto st0;
-st7:
-	p += 1;
-case 7:
-	switch( (*p) ) {
-		case 0: goto tr14;
-		case 46: goto tr16;
-		case 92: goto tr17;
-	}
-	if ( 33 <= (*p) && (*p) <= 126 )
-		goto tr15;
-	goto st0;
-tr11:
-#line 8 "dnsparse.hpp.rl"
-	{ decb = (*p) - '0'; }
-	goto st8;
-st8:
-	p += 1;
-case 8:
-#line 10 "dnsparse.hpp.rl"
-	{ decb *= 10; }
-#line 9 "dnsparse.hpp.rl"
-	{ decb += (*p) - '0'; }
-#line 280 "dnsparse.hpp"
-	if ( (*p) == 53 )
-		goto st9;
-	if ( 48 <= (*p) && (*p) <= 52 )
-		goto st6;
-	goto st0;
-st9:
-	p += 1;
-case 9:
-#line 10 "dnsparse.hpp.rl"
-	{ decb *= 10; }
-#line 9 "dnsparse.hpp.rl"
-	{ decb += (*p) - '0'; }
-#line 293 "dnsparse.hpp"
 	if ( 48 <= (*p) && (*p) <= 53 )
-		goto st7;
+		goto st9;
 	goto st0;
+	}
+	_test_eof7: cs = 7; goto _test_eof; 
+	_test_eof8: cs = 8; goto _test_eof; 
+	_test_eof2: cs = 2; goto _test_eof; 
+	_test_eof3: cs = 3; goto _test_eof; 
+	_test_eof4: cs = 4; goto _test_eof; 
+	_test_eof9: cs = 9; goto _test_eof; 
+	_test_eof5: cs = 5; goto _test_eof; 
+	_test_eof6: cs = 6; goto _test_eof; 
+
+	_test_eof: {}
+	if ( p == eof )
+	{
+	switch ( cs ) {
+	case 7: 
+#line 35 "dnsparse.hpp.rl"
+	{
+        nlen += llen;
+        dotfun (llen, nlen);
+    }
+	break;
+	case 9: 
+#line 13 "dnsparse.hpp.rl"
+	{
+        ++llen;
+        labelfun (decb);
+    }
+#line 35 "dnsparse.hpp.rl"
+	{
+        nlen += llen;
+        dotfun (llen, nlen);
+    }
+	break;
+#line 291 "dnsparse.hpp"
+	}
 	}
 
 	_out: {}
 	}
 
-#line 88 "dnsparse.hpp.rl"
+#line 75 "dnsparse.hpp.rl"
 #pragma clang diagnostic pop
 
-    if (cs < 10) {
+    if (cs < 7) {
         throw BadDNSName();
     }
     
-    return p;
+    return nlen;
 }
 
 }
