@@ -121,7 +121,7 @@ tr9:
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen, nlen);
+        dotfun (llen);
     }
 	goto st8;
 tr14:
@@ -133,7 +133,7 @@ tr14:
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen, nlen);
+        dotfun (llen);
     }
 	goto st8;
 st8:
@@ -272,7 +272,7 @@ case 6:
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen, nlen);
+        dotfun (llen);
     }
 	break;
 	case 9: 
@@ -284,7 +284,7 @@ case 6:
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen, nlen);
+        dotfun (llen);
     }
 	break;
 #line 291 "dnsparse.hpp"

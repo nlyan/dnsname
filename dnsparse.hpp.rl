@@ -34,7 +34,7 @@
     # Invoked at the end of *every* label
     action endlabel {
         nlen += llen;
-        dotfun (llen, nlen);
+        dotfun (llen);
     }
 
     raw     = any - digit;

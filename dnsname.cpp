@@ -24,18 +24,19 @@ DNSName::DNSName
         [&](char c) {
             *out++ = c;
         },
-        [&](unsigned llen, unsigned nlen) {
+        [&](unsigned llen) {
             if (llen > 63) {
                 throw std::runtime_error ("DNS label is too long");
-            }
-            if (nlen > 253) {
-                throw std::runtime_error ("DNS name is too long");
             }
             *llen_ptr = lll_ ^ static_cast<char>(llen);
             llen_ptr = std::addressof (*out++);
             lll_ = static_cast<char>(llen);
         }
     );
+
+    if (name_len > 253) {
+        throw std::runtime_error ("DNS name is too long");
+    }
 
     str_.resize (name_len);
 }
