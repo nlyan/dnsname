@@ -90,12 +90,13 @@ class DNSName final {
 
         auto
         label_count() const noexcept {
-            return static_cast<std::uint8_t>(std::distance (begin(), end()));
+            return lcount_;
         }
     private:
         std::string str_;
         char fll_; /* First label length */
         char lll_; /* Last label length */
+        unsigned char lcount_; /* Number of labels */
 };
 
 

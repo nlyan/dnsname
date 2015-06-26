@@ -7,7 +7,7 @@ BadDNSName::~BadDNSName() noexcept {
 
 
 DNSName::DNSName
-(std::string str): str_(std::move (str)), fll_(0), lll_(0) {   
+(std::string str): str_(std::move (str)), fll_(0), lll_(0), lcount_(0) {
     auto out = std::begin (str_);
     char* llen_ptr = &fll_;
     
@@ -31,6 +31,7 @@ DNSName::DNSName
             *llen_ptr = lll_ ^ static_cast<char>(llen);
             llen_ptr = std::addressof (*out++);
             lll_ = static_cast<char>(llen);
+            ++lcount_;
         }
     );
 
