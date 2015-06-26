@@ -8,11 +8,15 @@
 #include <boost/utility/string_ref.hpp> 
 #include <boost/iterator/iterator_facade.hpp>
 
+
 using DNSLabel = boost::basic_string_ref<char, DNSCharTraits>;
+
 
 class BadDNSName final: public std::runtime_error {
     public:
         BadDNSName () noexcept: std::runtime_error("Bad DNS name") {}
+        explicit BadDNSName (char const* msg) noexcept: 
+            std::runtime_error(msg) {}
         BadDNSName (BadDNSName const&) = default;
         BadDNSName (BadDNSName &&) = default;
         ~BadDNSName() noexcept;
