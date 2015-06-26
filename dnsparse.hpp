@@ -9,10 +9,10 @@
 
 namespace {
     
-template <typename LabelFun, typename DotFun> 
-auto parse_dns_name_cstr (
-    char const* p,
-    char const* const pe,
+template <typename Iterator, typename LabelFun, typename DotFun> 
+auto parse_dns_name (
+    Iterator p,
+    Iterator const pe,
     LabelFun&& labelfun, 
     DotFun&& dotfun
 ){

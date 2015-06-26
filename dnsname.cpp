@@ -18,9 +18,9 @@ DNSName::DNSName
         return;
     }
     
-    std::size_t name_len = parse_dns_name_cstr (
-        str_.c_str(),
-        str_.c_str() + str_.size(),
+    auto const name_len = parse_dns_name (
+        std::cbegin (str_),
+        std::cend (str_),
         [&](char c) {
             *out++ = c;
         },
