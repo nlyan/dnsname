@@ -1,5 +1,5 @@
 #include "dnsname.hpp"
-#include <fstream>
+#include <vector>
 #include <iostream>
 #include <tuple>
 #include <iterator>
