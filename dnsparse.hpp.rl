@@ -12,7 +12,7 @@
     # Invoked at the end of every decimal escape sequence
     action enddec {
         ++llen;
-        labelfun (decb);
+        labelfun ({decb});
     }
     
     # Invoked at the beginning of *every* label
@@ -23,7 +23,7 @@
     # Invoked on every unescaped and decoded character in a label
     action lchar {
         ++llen;
-        labelfun (fc);
+        labelfun ({fc});
     }
 
     # Invoked on inner dots e.g. for the first 2 dots in "foo.bar.com."
@@ -34,7 +34,7 @@
     # Invoked at the end of *every* label
     action endlabel {
         nlen += llen;
-        dotfun (llen);
+        dotfun ({llen});
     }
 
     raw     = any - digit;

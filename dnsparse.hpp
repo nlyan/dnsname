@@ -68,14 +68,14 @@ tr0:
 #line 24 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun ((*p));
+        labelfun ({(*p)});
     }
 	goto st7;
 tr3:
 #line 24 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun ((*p));
+        labelfun ({(*p)});
     }
 	goto st7;
 tr11:
@@ -90,19 +90,19 @@ tr11:
 #line 24 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun ((*p));
+        labelfun ({(*p)});
     }
 	goto st7;
 tr13:
 #line 13 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun (decb);
+        labelfun ({decb});
     }
 #line 24 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun ((*p));
+        labelfun ({(*p)});
     }
 	goto st7;
 st7:
@@ -121,19 +121,19 @@ tr9:
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen);
+        dotfun ({llen});
     }
 	goto st8;
 tr14:
 #line 13 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun (decb);
+        labelfun ({decb});
     }
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen);
+        dotfun ({llen});
     }
 	goto st8;
 st8:
@@ -169,7 +169,7 @@ tr15:
 #line 13 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun (decb);
+        labelfun ({decb});
     }
 	goto st2;
 st2:
@@ -272,19 +272,19 @@ case 6:
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen);
+        dotfun ({llen});
     }
 	break;
 	case 9: 
 #line 13 "dnsparse.hpp.rl"
 	{
         ++llen;
-        labelfun (decb);
+        labelfun ({decb});
     }
 #line 35 "dnsparse.hpp.rl"
 	{
         nlen += llen;
-        dotfun (llen);
+        dotfun ({llen});
     }
 	break;
 #line 291 "dnsparse.hpp"
