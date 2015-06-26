@@ -5,23 +5,23 @@
 #include <stdexcept>                    // for runtime_error
 #include <iosfwd>                       // for forward decl of ostream
 #include <cassert>                      // for assert
-#include <boost/utility/string_ref.hpp> 
+#include <boost/utility/string_ref.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-
 
 using DNSLabel = boost::basic_string_ref<char, DNSCharTraits>;
 
-
 class BadDNSName final: public std::runtime_error {
     public:
-        BadDNSName () noexcept: std::runtime_error("Bad DNS name") {}
+        BadDNSName() noexcept:
+            std::runtime_error ("Bad DNS name") {}
+
         explicit BadDNSName (char const* msg) noexcept: 
-            std::runtime_error(msg) {}
-        BadDNSName (BadDNSName const&) = default;
+            std::runtime_error (msg) {}
+
         BadDNSName (BadDNSName &&) = default;
+        BadDNSName (BadDNSName const&) = default;
         ~BadDNSName() noexcept;
 };
-
 
 class DNSLabelIterator final: public boost::iterator_facade<
     DNSLabelIterator,
@@ -31,6 +31,7 @@ class DNSLabelIterator final: public boost::iterator_facade<
 >{
     friend class DNSName;
     friend class boost::iterator_core_access;
+
     private:
         DNSLabelIterator (char const* label, char len) noexcept:
             label_(label), len_(len) {
@@ -46,28 +47,30 @@ class DNSLabelIterator final: public boost::iterator_facade<
             return DNSLabel (label_, static_cast<std::size_t>(len_));
         }
 
-        void increment() noexcept {
+        void
+        increment() noexcept {
             assert (len_ != 0);
             std::advance (label_, len_);
             len_ ^= *label_++;
         }
 
-        void decrement() noexcept {
+        void
+        decrement() noexcept {
             assert (len_ != 0);
             len_ ^= *--label_;
             std::advance (label_, -1 * len_);
         }
+
     private:
         char const* label_;
         char len_;
 };
 
-
 class DNSName final {
     public:
         DNSName (std::string);
         DNSName (char const*) = delete;
-        
+
         DNSLabelIterator 
         begin() const noexcept {
             if (fll_) {
@@ -96,24 +99,27 @@ class DNSName final {
         label_count() const noexcept {
             return lcount_;
         }
+
     private:
         std::string str_;
-        char fll_; /* First label length */
-        char lll_; /* Last label length */
-        unsigned char lcount_; /* Number of labels */
+        char fll_;              /* First label length */
+        char lll_;              /* Last label length */
+        unsigned char lcount_;  /* Number of labels */
 };
 
 
 inline bool 
 operator== (DNSName const& n1, DNSName const& n2) noexcept {
-    using std::begin; using std::end;
+    using std::begin;
+    using std::end;
     return std::equal (begin(n1), end(n1), begin(n2), end(n2));
 }
 
 
 inline bool 
 operator< (DNSName const& n1, DNSName const& n2) noexcept {
-    using std::rbegin; using std::rend;
+    using std::rbegin;
+    using std::rend;
     return std::lexicographical_compare 
            (rbegin(n1), rend(n1), rbegin(n2), rend(n2));
 }

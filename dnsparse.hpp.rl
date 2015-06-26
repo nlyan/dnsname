@@ -1,65 +1,69 @@
-#include <string>
-
 %%{
     machine escaped_dnsname;
     alphtype char;
     
-    # Invoked at the beginning of every 3 character decimal escape sequence (e.g. "\126")
-    action begdec { decb = fc - '0'; }
-    action add    { decb += fc - '0'; }
-    action mul10  { decb *= 10; }
-    
-    # Invoked at the end of every decimal escape sequence
-    action enddec {
-        ++llen;
-        labelfun ({decb});
-    }
-    
-    # Invoked at the beginning of *every* label
-    action beglabel {
+    # Invoked at the beginning of every label
+    action label_init {
         llen = 0;
     }
+
+    # Invoked at the beginning of every 3 character decimal escape sequence
+    # (e.g. "\126")
+    action dec_init     { decb = fc - '0'; }
     
-    # Invoked on every unescaped and decoded character in a label
-    action lchar {
+    # Arithmetic decoding of the decimal escape sequence
+    action dec_add      { decb += fc - '0'; }
+    action dec_mul10    { decb *= 10; }
+
+    # Invoked at the end of every decimal escape sequence
+    action dec_fin {
         ++llen;
-        labelfun ({fc});
+        commit ({decb});
     }
 
-    # Invoked on inner dots e.g. for the first 2 dots in "foo.bar.com."
-    action inner_dot {
+    # Invoked on every printable and/or escaped byte in a label (but not inside
+    # decimal escape sequences)
+    action label_char {
+        ++llen;
+        commit ({fc});
+    }
+
+    # Invoked on label separators e.g. for the first two periods in "x.y.z.",
+    # but not the last
+    action label_sep {
         ++nlen;
     }
-    
-    # Invoked at the end of *every* label
-    action endlabel {
+
+    # Invoked at the end of every label
+    action label_fin {
         nlen += llen;
-        dotfun ({llen});
+        commit_label ({llen});
     }
 
     raw     = any - digit;
-    safe    = ((0x21 .. 0x7e) - [.\\]) >lchar;
-    escaped = '\\' (raw >lchar);
-    decbyte = '\\' ((([01] digit{2}) | ('2' [0-4] digit) | ('2' '5' [0-5]))
-                    >begdec
-                    <>*mul10
-                    <>*add
-                    %enddec
+    plain   = ((0x21 .. 0x7e) - [.\\]) >label_char;
+    escaped = '\\' (raw >label_char);
+    escdecb = '\\' ((([01] digit{2}) | ('2' [0-4] digit) | ('2' '5' [0-5]))
+                    >dec_init
+                    <>*dec_mul10
+                    <>*dec_add
+                    %dec_fin
                 );
 
-    label = (safe | escaped | decbyte)+ >beglabel %endlabel;
-    dnsname := label ('.' label >inner_dot)* '.'?;
+    label = (plain | escaped | escdecb)+ >label_init %label_fin;
+    dnsname := label ('.' label >label_sep)* '.'?;
 }%%
 
 
 namespace {
-    
-template <typename Iterator, typename LabelFun, typename DotFun> 
-auto parse_dns_name (
+
+template <typename Iterator, typename CommitFun, typename LabelFun>
+auto
+parse_dnsname (
     Iterator p,
     Iterator const pe,
-    LabelFun&& labelfun, 
-    DotFun&& dotfun
+    CommitFun&& commit,
+    LabelFun&& commit_label
 ){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"

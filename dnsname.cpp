@@ -5,20 +5,19 @@
 BadDNSName::~BadDNSName() noexcept {
 }
 
-
 DNSName::DNSName
 (std::string str): str_(std::move (str)), fll_(0), lll_(0), lcount_(0) {
     auto out = std::begin (str_);
     char* llen_ptr = &fll_;
-    
+
     if (str_ == ".") {
         str_.clear();
     }
     if (str_.empty()) {
         return;
     }
-    
-    auto const name_len = parse_dns_name (
+
+    auto const name_len = parse_dnsname (
         std::cbegin (str_),
         std::cend (str_),
         [&](char c) {
@@ -41,7 +40,6 @@ DNSName::DNSName
 
     str_.resize (name_len);
 }
-
 
 static const char decimal_escape_seqs[162][3] = {
     {'1','2','7'},{'1','2','8'},{'1','2','9'},{'1','3','0'},{'1','3','1'},
@@ -79,7 +77,6 @@ static const char decimal_escape_seqs[162][3] = {
     {'0','3','1'},{'0','3','2'}
 };
 
-
 std::ostream&
 operator<< (std::ostream& os, DNSLabel const& label) {
     std::ostream::sentry sentry (os);
@@ -111,13 +108,15 @@ operator<< (std::ostream& os, DNSLabel const& label) {
 
 std::ostream&
 operator<< (std::ostream& os, DNSName const& name) {
+    using std::begin;
+    using std::end;
     std::ostream::sentry sentry (os);
     if (!sentry) {
         return os;
     }
     std::ostreambuf_iterator<char> out(os);
-    auto l_it = name.begin();
-    auto const l_end = name.end();
+    auto l_it = begin (name);
+    auto const l_end = end (name);
     if (l_it != l_end) {
         os << *l_it++;
         while (l_it != l_end) {

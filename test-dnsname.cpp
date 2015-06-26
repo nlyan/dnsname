@@ -4,11 +4,10 @@
 #define BOOST_TEST_MODULE dnsname_test
 #include <boost/test/included/unit_test.hpp>
 #include <vector>
-#include <numeric>
-#include <sstream>
-#include <fstream>
-#include <algorithm>
-#include <iostream>
+#include <numeric>                              /* For iota */
+#include <sstream>                              /* For stringstream */
+#include <fstream>                              /* For ifstream */
+#include <algorithm>                            /* For next_permutation etc */
 #include <locale>
 
 using namespace std::literals::string_literals;
@@ -51,6 +50,8 @@ BOOST_AUTO_TEST_CASE (escapes) {
     BOOST_CHECK_THROW (DNSName (R"(\\\\..)"s), BadDNSName);
     BOOST_CHECK_NO_THROW (DNSName (R"(\.)"s));
     BOOST_CHECK_NO_THROW (DNSName (R"(\\)"s));
+    BOOST_CHECK_THROW (DNSName ("www.google.com.\x00subdomain.domain.com"s),
+                       BadDNSName);
 }
 
 BOOST_AUTO_TEST_CASE (case_insensitivity) {
@@ -114,33 +115,25 @@ BOOST_AUTO_TEST_CASE (printable_equality) {
 }
 
 BOOST_AUTO_TEST_CASE (decimal_escapes) {
-    BOOST_CHECK_THROW (DNSName ("www.google.com.\x00subdomain.domain.com"s),
-                       BadDNSName);
+    /* 1 digit */
     for (auto i = 0; i < 10; ++i) {
         std::ostringstream oss;
         oss << "\\" << i;
         BOOST_CHECK_THROW (DNSName (oss.str()), BadDNSName);
     }
-    for (auto i = 0; i < 10; ++i) {
+    /* 2 digits */
+    for (auto i = 0; i < 100; ++i) {
         std::ostringstream oss;
         oss << "\\" << std::setw(2) << std::setfill('0') << i;
         BOOST_CHECK_THROW (DNSName (oss.str()), BadDNSName);
     }
-    for (auto i = 0; i < 10; ++i) {
+    /* 3 digits */
+    for (auto i = 0; i < 256; ++i) {
         std::ostringstream oss;
         oss << "\\" << std::setw(3) << std::setfill('0') << i;
         BOOST_CHECK_NO_THROW (DNSName x(oss.str()));
     }
-    for (auto i = 10; i < 100; ++i) {
-        std::ostringstream oss;
-        oss << "\\" << i;
-        BOOST_CHECK_THROW (DNSName (oss.str()), BadDNSName);
-    }
-    for (auto i = 10; i < 100; ++i) {
-        std::ostringstream oss;
-        oss << "\\" << std::setw(3) << std::setfill('0') << i;
-        BOOST_CHECK_NO_THROW (DNSName x(oss.str()));
-    }
+    /* Equality with escaped, unencoded, raw bytes e.g. "\\\x00" == R"(\000)" */
     for (auto i = 0; i < 48; ++i) {
         std::ostringstream oss;
         oss << "\\" << std::setw(3) << std::setfill('0') << i;
@@ -159,26 +152,26 @@ BOOST_AUTO_TEST_CASE (decimal_escapes) {
 
 BOOST_AUTO_TEST_CASE (streaming) {
     std::ostringstream oss;
-    std::string str ("www.google.com"s);
+    std::string str (R"(www.google.com)"s);
     oss << DNSName (str);
     BOOST_CHECK_EQUAL (oss.str(), str);
 
     oss.clear ();
     oss.str (std::string());
-    oss << DNSName ("WwW.Goo\\ GLe.cOm"s);
-    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\032gle.com"s);
+    oss << DNSName (R"(WwW.Goo\ GLe.cOm)"s);
+    BOOST_CHECK_EQUAL (oss.str(), R"(www.goo\032gle.com)"s);
     
     oss.clear ();
     oss.str (std::string());
     auto flags = oss.flags();
-    oss << std::showpoint << std::uppercase << DNSName ("WwW.Goo\\ GLe.cOm"s);
+    oss << std::showpoint << std::uppercase << DNSName (R"(WwW.Goo\ GLe.cOm)"s);
     oss.flags (flags);
-    BOOST_CHECK_EQUAL (oss.str(), "WwW.Goo\\032GLe.cOm."s);
+    BOOST_CHECK_EQUAL (oss.str(), R"(WwW.Goo\032GLe.cOm.)"s);
 
     oss.clear ();
     oss.str (std::string());
-    oss << DNSName ("www.goo\\046gle.com."s);
-    BOOST_CHECK_EQUAL (oss.str(), "www.goo\\.gle.com"s);
+    oss << DNSName (R"(www.goo\046gle.com.)"s);
+    BOOST_CHECK_EQUAL (oss.str(), R"(www.goo\.gle.com)"s);
 }
 
 BOOST_AUTO_TEST_CASE (alexa) {
