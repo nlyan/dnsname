@@ -4,6 +4,7 @@
 #include <locale>
 #include <chrono>
 #include <fstream>
+#include <algorithm>
 #include <iostream>
 
 int main() {
@@ -23,7 +24,13 @@ int main() {
         std::getline (top1m, line, '\n');
         block_list.emplace_back (std::move(line));
     }
-    auto end = std::chrono::steady_clock::now();
+    auto stop = std::chrono::steady_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>
-                    (end - start).count() << " ms" << std::endl;
+                    (stop - start).count() << " ms" << std::endl;
+                    
+    start = std::chrono::steady_clock::now();
+    std::sort (begin(block_list), end(block_list));
+    stop = std::chrono::steady_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>
+                    (stop - start).count() << " ms" << std::endl;
 }
