@@ -33,7 +33,7 @@ struct nth_label_cmp {
 
 template <typename SortedDNSNames>
 typename boost::range_iterator<SortedDNSNames>::type
-find_parent (
+find_root (
     DNSName const& query,
     SortedDNSNames& sorted_names
 ){
@@ -99,7 +99,7 @@ int main() {
         std::getline (std::cin, line);
         DNSName name (std::move(line));
         auto start = std::chrono::high_resolution_clock::now();
-        auto blocker = find_parent (name, block_list);
+        auto blocker = find_root (name, block_list);
         auto stop = std::chrono::high_resolution_clock::now();
         std::cout << "  Lookup took "
                   << std::chrono::duration_cast<std::chrono::microseconds>
