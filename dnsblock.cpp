@@ -46,7 +46,7 @@ find_parent (
         std::tie (notless, greater)
             = std::equal_range (notless, greater, *label++, nth_label_cmp{i});
         if (notless == greater) {
-            return end (sorted_names);
+            break;
         }
         if (std::next(notless) == greater) {
             return notless;
