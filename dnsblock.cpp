@@ -98,13 +98,19 @@ int main() {
         std::cout << "> ";
         std::getline (std::cin, line);
         DNSName name (std::move(line));
+        auto start = std::chrono::high_resolution_clock::now();
         auto blocker = find_parent (name, block_list);
+        auto stop = std::chrono::high_resolution_clock::now();
+        std::cout << "  Lookup took "
+                  << std::chrono::duration_cast<std::chrono::microseconds>
+                     (stop - start).count()
+                  << " us" << std::endl;
         if (blocker == end (block_list)) {
-            std::cout << "    OK: '" << name << "' is not blocked! :D"
+            std::cout << "  OK: '" << name << "' is not blocked! :D"
                       << std::endl;
             continue;
         }
-        std::cout << "    BLOCKED: '" << name << "' is blocked by '"
+        std::cout << "  BLOCKED: '" << name << "' is blocked by '"
                   << *blocker << "' :(" << std::endl;
     };
 }
