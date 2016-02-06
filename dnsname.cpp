@@ -7,15 +7,15 @@ BadDNSName::~BadDNSName() noexcept {
 
 DNSName::DNSName
 (std::string str): str_(std::move (str)), fll_(0), lll_(0), lcount_(0) {
-    auto out = std::begin (str_);
-    char* llen_ptr = &fll_;
-
     if (str_ == ".") {
         str_.clear();
     }
     if (str_.empty()) {
         return;
     }
+
+    auto out = std::begin (str_);
+    char* llen_ptr = &fll_;
 
     auto const name_len = parse_dnsname (
         std::cbegin (str_),
