@@ -51,19 +51,19 @@
                 );
 
     label = (plain | escaped | escdecb)+ >label_init %label_fin;
-    dnsname := label ('.' label >label_sep)* '.'?;
+    dnsname := '.'? label ('.' label >label_sep)* '.'?;
 }%%
 
 
 namespace {
 
-template <typename Iterator, typename CommitFun, typename LabelFun>
+template <typename Iterator, typename CommitFun, typename CommitLabelFun>
 auto
 parse_dnsname (
     Iterator p,
     Iterator const pe,
     CommitFun&& commit,
-    LabelFun&& commit_label
+    CommitLabelFun&& commit_label
 ){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"

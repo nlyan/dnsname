@@ -7,13 +7,13 @@
 
 namespace {
 
-template <typename Iterator, typename CommitFun, typename LabelFun>
+template <typename Iterator, typename CommitFun, typename CommitLabelFun>
 auto
 parse_dnsname (
     Iterator p,
     Iterator const pe,
     CommitFun&& commit,
-    LabelFun&& commit_label
+    CommitLabelFun&& commit_label
 ){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"
@@ -21,7 +21,7 @@ parse_dnsname (
 
 #line 23 "dnsparse.hpp"
 static const int escaped_dnsname_start = 1;
-static const int escaped_dnsname_first_final = 7;
+static const int escaped_dnsname_first_final = 8;
 static const int escaped_dnsname_error = 0;
 
 static const int escaped_dnsname_en_dnsname = 1;
@@ -48,12 +48,11 @@ static const int escaped_dnsname_en_dnsname = 1;
 	switch ( cs )
 	{
 case 1:
-	if ( (*p) == 92 )
-		goto tr2;
-	if ( (*p) > 45 ) {
-		if ( 47 <= (*p) && (*p) <= 126 )
-			goto tr0;
-	} else if ( (*p) >= 33 )
+	switch( (*p) ) {
+		case 46: goto st7;
+		case 92: goto tr3;
+	}
+	if ( 33 <= (*p) && (*p) <= 126 )
 		goto tr0;
 	goto st0;
 st0:
@@ -69,91 +68,14 @@ tr0:
         ++llen;
         commit ({(*p)});
     }
-	goto st7;
-tr3:
+	goto st8;
+tr4:
 #line 26 "dnsparse.hpp.rl"
 	{
         ++llen;
         commit ({(*p)});
-    }
-	goto st7;
-tr11:
-#line 33 "dnsparse.hpp.rl"
-	{
-        ++nlen;
-    }
-#line 6 "dnsparse.hpp.rl"
-	{
-        llen = 0;
-    }
-#line 26 "dnsparse.hpp.rl"
-	{
-        ++llen;
-        commit ({(*p)});
-    }
-	goto st7;
-tr13:
-#line 19 "dnsparse.hpp.rl"
-	{
-        ++llen;
-        commit ({decb});
-    }
-#line 26 "dnsparse.hpp.rl"
-	{
-        ++llen;
-        commit ({(*p)});
-    }
-	goto st7;
-st7:
-	if ( ++p == pe )
-		goto _test_eof7;
-case 7:
-#line 112 "dnsparse.hpp"
-	switch( (*p) ) {
-		case 46: goto tr9;
-		case 92: goto st2;
-	}
-	if ( 33 <= (*p) && (*p) <= 126 )
-		goto tr3;
-	goto st0;
-tr9:
-#line 38 "dnsparse.hpp.rl"
-	{
-        nlen += llen;
-        commit_label ({llen});
     }
 	goto st8;
-tr14:
-#line 19 "dnsparse.hpp.rl"
-	{
-        ++llen;
-        commit ({decb});
-    }
-#line 38 "dnsparse.hpp.rl"
-	{
-        nlen += llen;
-        commit_label ({llen});
-    }
-	goto st8;
-st8:
-	if ( ++p == pe )
-		goto _test_eof8;
-case 8:
-#line 143 "dnsparse.hpp"
-	if ( (*p) == 92 )
-		goto tr12;
-	if ( (*p) > 45 ) {
-		if ( 47 <= (*p) && (*p) <= 126 )
-			goto tr11;
-	} else if ( (*p) >= 33 )
-		goto tr11;
-	goto st0;
-tr2:
-#line 6 "dnsparse.hpp.rl"
-	{
-        llen = 0;
-    }
-	goto st2;
 tr12:
 #line 33 "dnsparse.hpp.rl"
 	{
@@ -163,8 +85,85 @@ tr12:
 	{
         llen = 0;
     }
-	goto st2;
+#line 26 "dnsparse.hpp.rl"
+	{
+        ++llen;
+        commit ({(*p)});
+    }
+	goto st8;
+tr14:
+#line 19 "dnsparse.hpp.rl"
+	{
+        ++llen;
+        commit ({decb});
+    }
+#line 26 "dnsparse.hpp.rl"
+	{
+        ++llen;
+        commit ({(*p)});
+    }
+	goto st8;
+st8:
+	if ( ++p == pe )
+		goto _test_eof8;
+case 8:
+#line 111 "dnsparse.hpp"
+	switch( (*p) ) {
+		case 46: goto tr10;
+		case 92: goto st2;
+	}
+	if ( 33 <= (*p) && (*p) <= 126 )
+		goto tr4;
+	goto st0;
+tr10:
+#line 38 "dnsparse.hpp.rl"
+	{
+        nlen += llen;
+        commit_label ({llen});
+    }
+	goto st9;
 tr15:
+#line 19 "dnsparse.hpp.rl"
+	{
+        ++llen;
+        commit ({decb});
+    }
+#line 38 "dnsparse.hpp.rl"
+	{
+        nlen += llen;
+        commit_label ({llen});
+    }
+	goto st9;
+st9:
+	if ( ++p == pe )
+		goto _test_eof9;
+case 9:
+#line 142 "dnsparse.hpp"
+	if ( (*p) == 92 )
+		goto tr13;
+	if ( (*p) > 45 ) {
+		if ( 47 <= (*p) && (*p) <= 126 )
+			goto tr12;
+	} else if ( (*p) >= 33 )
+		goto tr12;
+	goto st0;
+tr3:
+#line 6 "dnsparse.hpp.rl"
+	{
+        llen = 0;
+    }
+	goto st2;
+tr13:
+#line 33 "dnsparse.hpp.rl"
+	{
+        ++nlen;
+    }
+#line 6 "dnsparse.hpp.rl"
+	{
+        llen = 0;
+    }
+	goto st2;
+tr16:
 #line 19 "dnsparse.hpp.rl"
 	{
         ++llen;
@@ -175,16 +174,16 @@ st2:
 	if ( ++p == pe )
 		goto _test_eof2;
 case 2:
-#line 179 "dnsparse.hpp"
+#line 178 "dnsparse.hpp"
 	if ( (*p) == 50 )
-		goto tr5;
+		goto tr6;
 	if ( (*p) > 49 ) {
 		if ( 51 <= (*p) && (*p) <= 57 )
 			goto st0;
 	} else if ( (*p) >= 48 )
-		goto tr4;
-	goto tr3;
-tr4:
+		goto tr5;
+	goto tr4;
+tr5:
 #line 12 "dnsparse.hpp.rl"
 	{ decb = (*p) - '0'; }
 	goto st3;
@@ -196,7 +195,7 @@ case 3:
 	{ decb *= 10; }
 #line 15 "dnsparse.hpp.rl"
 	{ decb += (*p) - '0'; }
-#line 200 "dnsparse.hpp"
+#line 199 "dnsparse.hpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto st4;
 	goto st0;
@@ -208,22 +207,22 @@ case 4:
 	{ decb *= 10; }
 #line 15 "dnsparse.hpp.rl"
 	{ decb += (*p) - '0'; }
-#line 212 "dnsparse.hpp"
+#line 211 "dnsparse.hpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto st9;
+		goto st10;
 	goto st0;
-st9:
+st10:
 	if ( ++p == pe )
-		goto _test_eof9;
-case 9:
+		goto _test_eof10;
+case 10:
 	switch( (*p) ) {
-		case 46: goto tr14;
-		case 92: goto tr15;
+		case 46: goto tr15;
+		case 92: goto tr16;
 	}
 	if ( 33 <= (*p) && (*p) <= 126 )
-		goto tr13;
+		goto tr14;
 	goto st0;
-tr5:
+tr6:
 #line 12 "dnsparse.hpp.rl"
 	{ decb = (*p) - '0'; }
 	goto st5;
@@ -235,7 +234,7 @@ case 5:
 	{ decb *= 10; }
 #line 15 "dnsparse.hpp.rl"
 	{ decb += (*p) - '0'; }
-#line 239 "dnsparse.hpp"
+#line 238 "dnsparse.hpp"
 	if ( (*p) == 53 )
 		goto st6;
 	if ( 48 <= (*p) && (*p) <= 52 )
@@ -249,32 +248,45 @@ case 6:
 	{ decb *= 10; }
 #line 15 "dnsparse.hpp.rl"
 	{ decb += (*p) - '0'; }
-#line 253 "dnsparse.hpp"
+#line 252 "dnsparse.hpp"
 	if ( 48 <= (*p) && (*p) <= 53 )
-		goto st9;
+		goto st10;
+	goto st0;
+st7:
+	if ( ++p == pe )
+		goto _test_eof7;
+case 7:
+	if ( (*p) == 92 )
+		goto tr3;
+	if ( (*p) > 45 ) {
+		if ( 47 <= (*p) && (*p) <= 126 )
+			goto tr0;
+	} else if ( (*p) >= 33 )
+		goto tr0;
 	goto st0;
 	}
-	_test_eof7: cs = 7; goto _test_eof; 
 	_test_eof8: cs = 8; goto _test_eof; 
+	_test_eof9: cs = 9; goto _test_eof; 
 	_test_eof2: cs = 2; goto _test_eof; 
 	_test_eof3: cs = 3; goto _test_eof; 
 	_test_eof4: cs = 4; goto _test_eof; 
-	_test_eof9: cs = 9; goto _test_eof; 
+	_test_eof10: cs = 10; goto _test_eof; 
 	_test_eof5: cs = 5; goto _test_eof; 
 	_test_eof6: cs = 6; goto _test_eof; 
+	_test_eof7: cs = 7; goto _test_eof; 
 
 	_test_eof: {}
 	if ( p == eof )
 	{
 	switch ( cs ) {
-	case 7: 
+	case 8: 
 #line 38 "dnsparse.hpp.rl"
 	{
         nlen += llen;
         commit_label ({llen});
     }
 	break;
-	case 9: 
+	case 10: 
 #line 19 "dnsparse.hpp.rl"
 	{
         ++llen;
@@ -286,7 +298,7 @@ case 6:
         commit_label ({llen});
     }
 	break;
-#line 290 "dnsparse.hpp"
+#line 302 "dnsparse.hpp"
 	}
 	}
 
@@ -296,7 +308,7 @@ case 6:
 #line 79 "dnsparse.hpp.rl"
 #pragma clang diagnostic pop
 
-    if (cs < 7) {
+    if (cs < 8) {
         throw BadDNSName();
     }
     
