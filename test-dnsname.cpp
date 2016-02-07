@@ -29,10 +29,10 @@ BOOST_AUTO_TEST_CASE (dots) {
     BOOST_CHECK_EQUAL (DNSName ("mail.example.com"s), DNSName ("mail.example.com"s));
     BOOST_CHECK_EQUAL (DNSName ("mail.example.com"s), DNSName ("mail.example.com."s));
     BOOST_CHECK_EQUAL (DNSName ("mail.example.com."s), DNSName ("mail.example.com"s));
-    BOOST_CHECK_THROW (DNSName (".com"s), BadDNSName);
+    BOOST_CHECK_EQUAL (DNSName (".com"s), DNSName ("com"s));
+    BOOST_CHECK_EQUAL (DNSName (".example.com."s), DNSName ("example.com."s));
     BOOST_CHECK_THROW (DNSName ("..com"s), BadDNSName);
     BOOST_CHECK_THROW (DNSName ("com.."s), BadDNSName);
-    BOOST_CHECK_THROW (DNSName (".example.com."s), BadDNSName);
     BOOST_CHECK_THROW (DNSName ("..example.com."s), BadDNSName);
     BOOST_CHECK_THROW (DNSName ("mail..example.com"s), BadDNSName);
     BOOST_CHECK_THROW (DNSName ("mail.example..com"s), BadDNSName);
