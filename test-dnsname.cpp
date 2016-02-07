@@ -58,49 +58,67 @@ BOOST_AUTO_TEST_CASE (case_insensitivity) {
     BOOST_CHECK_EQUAL (DNSName ("Com"s), DNSName ("com"s));
     BOOST_CHECK_EQUAL (DNSName ("com"s), DNSName ("coM"s));
     BOOST_CHECK_EQUAL (DNSName ("cOm"s), DNSName ("CoM"s));
-    BOOST_CHECK_EQUAL (DNSName ("abcdefghijklmnopqrstuvwxyz"s), 
+    BOOST_CHECK_EQUAL (DNSName ("abcdefghijklmnopqrstuvwxyz"s),
                        DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"s));
-    BOOST_CHECK_EQUAL (DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"s), 
+    BOOST_CHECK_EQUAL (DNSName ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"s),
                        DNSName ("abcdefghijklmnopqrstuvwxyz"s));
+}
+
+BOOST_AUTO_TEST_CASE (push_pop) {
+    DNSName name;
+    name.push_back ("www"s);
+    BOOST_CHECK_EQUAL (name, DNSName ("www"s));
+    name.push_back ("google"s);
+    BOOST_CHECK_EQUAL (name, DNSName ("www.google"s));
+    name.push_back ("com"s);
+    BOOST_CHECK_EQUAL (name, DNSName ("www.google.com"s));
+    name.pop_back ();
+    BOOST_CHECK_EQUAL (name, DNSName ("www.google"s));
+    name.pop_back ();
+    BOOST_CHECK_EQUAL (name, DNSName ("www"s));
+    name.pop_back ();
+    BOOST_CHECK_EQUAL (name, DNSName ());
+    BOOST_CHECK_EQUAL (name, DNSName (""s));
+    BOOST_CHECK_EQUAL (name, DNSName ("."s));
 }
 
 BOOST_AUTO_TEST_CASE (basic_printable) {
     std::string printable;
     printable.resize ((0x7e - 0x21) + 1);
     std::iota (begin (printable), end (printable), 0x21);
-    
+
     /* Split to avoid max label length */
     auto split = std::next(begin (printable), 64);
     std::string p1 (begin (printable), split);
     std::string p2 (split, end (printable));
-    
+
     BOOST_CHECK_EQUAL (p1.front(), 0x21);
     BOOST_CHECK_EQUAL (p2.back(), 0x7e);
     BOOST_CHECK_NO_THROW (DNSName x(p1));
     BOOST_CHECK_NO_THROW (DNSName x(p2));
 }
-    
+
 BOOST_AUTO_TEST_CASE (printable_equality) {
     /* All printables except uppercase characters */
     std::string printable_excl_uc;
     printable_excl_uc.resize ((0x7e - 0x21) + 1);
     std::iota (begin (printable_excl_uc), end (printable_excl_uc), 0x21);
     printable_excl_uc.erase (
-        std::remove_if (begin (printable_excl_uc), end (printable_excl_uc), 
+        std::remove_if (begin (printable_excl_uc), end (printable_excl_uc),
                         [](char c) { return ((c >= 'A') && (c <= 'Z')); }),
         end (printable_excl_uc)
     );
-    
+
     /* Split to avoid max label length */
     auto split = std::next(begin (printable_excl_uc), 64);
     std::string p1 (begin (printable_excl_uc), split);
     std::string p2 (split, end (printable_excl_uc));
-    
+
     BOOST_CHECK_EQUAL (p1.front(), 0x21);
     BOOST_CHECK_EQUAL (p2.back(), 0x7e);
     BOOST_CHECK_NO_THROW (DNSName x(p1));
     BOOST_CHECK_NO_THROW (DNSName x(p2));
-    
+
     /* Permute such that every char is compared to at least every other char */
     std::string p1p (p1);
     std::string p2p (p2);
@@ -160,7 +178,7 @@ BOOST_AUTO_TEST_CASE (streaming) {
     oss.str (std::string());
     oss << DNSName (R"(WwW.Goo\ GLe.cOm)"s);
     BOOST_CHECK_EQUAL (oss.str(), R"(www.goo\032gle.com)"s);
-    
+
     oss.clear ();
     oss.str (std::string());
     auto flags = oss.flags();
@@ -205,7 +223,7 @@ BOOST_AUTO_TEST_CASE (alexa) {
     presorted.reserve (top1m.capacity());
     presorted.assign (std::istream_iterator<std::string>(txt),
                       std::istream_iterator<std::string>());
-    BOOST_CHECK (std::equal(begin(top1m), end(top1m), 
+    BOOST_CHECK (std::equal(begin(top1m), end(top1m),
                             begin(presorted), end(presorted)));
 }
 

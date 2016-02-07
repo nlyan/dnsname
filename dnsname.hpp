@@ -18,10 +18,9 @@ struct DNSLabel: public dns_string_ref {
     template <typename... Args> explicit
     DNSLabel (Args&&... args): dns_string_ref (std::forward<Args>(args)...) {}
 
-    DNSLabel (DNSLabel &&) = default;
-    DNSLabel& operator= (DNSLabel &&) = default;
-
+    DNSLabel (DNSLabel&&) = default;
     DNSLabel (DNSLabel const&) = delete;
+    DNSLabel& operator= (DNSLabel&&) = default;
     DNSLabel& operator= (DNSLabel const&) = delete;
 
     operator dns_string() const { return dns_string(data(), size()); }
@@ -90,6 +89,7 @@ class DNSLabelIterator final: public boost::iterator_facade<
 
 class DNSName final {
     public:
+        DNSName () noexcept;
         DNSName (std::string);
         DNSName (char const*) = delete;
 
@@ -122,11 +122,57 @@ class DNSName final {
             return lcount_;
         }
 
+        template <typename Label>
+        void
+        push_back (Label const& label) {
+#ifndef NDEBUG
+            check();
+#endif
+            assert (label.size() <= 63);
+            if (label_count()) {
+                str_ += static_cast<char>(lll_ ^ label.size());
+            } else {
+                fll_ = static_cast<char>(label.size());
+            }
+            str_.append (label.data(), label.size());
+            lll_ = static_cast<char>(label.size());
+            ++lcount_;
+#ifndef NDEBUG
+            check();
+#endif
+        }
+
+        void
+        pop_back() {
+#ifndef NDEBUG
+            check();
+#endif
+            str_.resize (str_.size() - lll_);
+            --lcount_;
+            if (label_count()) {
+                lll_ ^= str_.back();
+                str_.pop_back();
+            } else {
+                assert (str_.empty());
+                fll_ = 0;
+                lll_ = 0;
+            }
+#ifndef NDEBUG
+            check();
+#endif
+        }
+
     private:
         std::string str_;
         char fll_;              /* First label length */
         char lll_;              /* Last label length */
         unsigned char lcount_;  /* Number of labels */
+
+#ifndef NDEBUG
+        void check_not_empty() const;
+        void check_empty() const;
+        void check() const;
+#endif
 };
 
 

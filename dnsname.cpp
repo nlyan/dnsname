@@ -6,6 +6,10 @@ BadDNSName::~BadDNSName() noexcept {
 }
 
 DNSName::DNSName
+() noexcept: fll_(0), lll_(0), lcount_(0) {
+}
+
+DNSName::DNSName
 (std::string str): str_(std::move (str)), fll_(0), lll_(0), lcount_(0) {
     if (str_ == ".") {
         str_.clear();
@@ -39,7 +43,54 @@ DNSName::DNSName
     }
 
     str_.resize (name_len);
+#ifndef NDEBUG
+    check();
+#endif
 }
+
+#ifndef NDEBUG
+void
+DNSName::check_not_empty() const {
+    assert (label_count());
+    assert (label_count() <= 127);
+    assert (str_.size() >= (2 * label_count() - 1));
+    assert (str_.size() <= 253);
+    assert (fll_);
+    assert (lll_);
+    assert (fll_ <= 63);
+    assert (lll_ <= 63);
+    if (label_count() == 1) {
+        assert (fll_ == lll_);
+        assert (str_.size() == fll_);
+    } else {
+        auto min_size = 2 * label_count() - 1;
+        min_size += fll_ - 1;
+        min_size += lll_ - 1;
+        assert (str_.size() >= min_size);
+    }
+    for (auto const& label: *this) {
+        assert (label.size());
+        assert (label.size() <= 63);
+    }
+}
+
+void
+DNSName::check_empty() const {
+    assert (!label_count());
+    assert (!fll_);
+    assert (!lll_);
+    assert (str_.empty());
+}
+
+void
+DNSName::check() const {
+    if (label_count()) {
+        check_not_empty();
+    } else {
+        check_empty();
+    }
+}
+#endif
 
 static const char decimal_escape_seqs[162][3] = {
     {'1','2','7'},{'1','2','8'},{'1','2','9'},{'1','3','0'},{'1','3','1'},
