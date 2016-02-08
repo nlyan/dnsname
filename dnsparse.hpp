@@ -311,7 +311,7 @@ case 7:
     if (cs < 8) {
         throw BadDNSName();
     }
-    
+
     return nlen;
 }
 

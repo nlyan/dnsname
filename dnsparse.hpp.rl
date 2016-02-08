@@ -1,7 +1,7 @@
 %%{
     machine escaped_dnsname;
     alphtype char;
-    
+
     # Invoked at the beginning of every label
     action label_init {
         llen = 0;
@@ -10,7 +10,7 @@
     # Invoked at the beginning of every 3 character decimal escape sequence
     # (e.g. "\126")
     action dec_init     { decb = fc - '0'; }
-    
+
     # Arithmetic decoding of the decimal escape sequence
     action dec_add      { decb += fc - '0'; }
     action dec_mul10    { decb *= 10; }
@@ -28,8 +28,8 @@
         commit ({fc});
     }
 
-    # Invoked on label separators e.g. for the first two periods in "x.y.z.",
-    # but not the last
+    # Invoked on label separators e.g. for the two inner periods in ".x.y.z.",
+    # but not the first or the last
     action label_sep {
         ++nlen;
     }
@@ -81,7 +81,7 @@ parse_dnsname (
     if (cs < %%{ write first_final; }%%) {
         throw BadDNSName();
     }
-    
+
     return nlen;
 }
 
